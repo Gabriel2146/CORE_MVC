@@ -18,6 +18,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-secret-key')
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
+if 'core-mvc-sd7s.onrender.com' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('core-mvc-sd7s.onrender.com')
 
 # Application definition
 
