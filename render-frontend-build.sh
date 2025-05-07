@@ -1,4 +1,4 @@
 #!/bin/bash
 cd frontend
 npm install
-npx vite build
+npm run build
