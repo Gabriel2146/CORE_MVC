@@ -24,7 +24,6 @@
           <option value="guest">Invitado</option>
           <option value="athlete">Deportista</option>
           <option value="trainer">Entrenador</option>
-          <option value="admin">Administrador</option>
         </select>
       </div>
       <button type="submit">Registrar</button>
