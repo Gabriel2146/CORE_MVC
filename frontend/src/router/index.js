@@ -1,36 +1,65 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import Home from '../components/Home.vue'
+import Login from '../views/Login.vue'
+import Admin from '../components/Admin.vue'
+import Trainer from '../components/Trainer.vue'
+import Athlete from '../components/Athlete.vue'
+import Guest from '../components/Guest.vue'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../components/Home.vue')
+    component: Home,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
   },
   {
     path: '/admin',
     name: 'Admin',
-    component: () => import('../components/Admin.vue')
+    component: Admin,
+    meta: { requiresAuth: true, role: 'admin' }
   },
   {
     path: '/trainer',
     name: 'Trainer',
-    component: () => import('../components/Trainer.vue')
+    component: Trainer,
+    meta: { requiresAuth: true, role: 'trainer' }
   },
   {
     path: '/athlete',
     name: 'Athlete',
-    component: () => import('../components/Athlete.vue')
+    component: Athlete,
+    meta: { requiresAuth: true, role: 'athlete' }
   },
   {
     path: '/guest',
     name: 'Guest',
-    component: () => import('../components/Guest.vue')
+    component: Guest,
+    meta: { requiresAuth: true, role: 'guest' }
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('access_token')
+  const userRole = localStorage.getItem('user_role') // You need to set this on login
+
+  if (to.meta.requiresAuth && !token) {
+    next({ name: 'Login' })
+  } else if (to.meta.role && to.meta.role !== userRole) {
+    next({ name: 'Home' }) // Redirect if role does not match
+  } else {
+    next()
+  }
 })
 
 export default router
