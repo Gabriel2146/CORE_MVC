@@ -32,7 +32,8 @@ export default {
 
     const login = async () => {
       try {
-        const response = await axios.post('http://localhost:8000/api/users/token/', {
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+        const response = await axios.post(`${apiBaseUrl}/api/users/token/`, {
           username: username.value,
           password: password.value
         })
@@ -41,7 +42,7 @@ export default {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access
 
         // Fetch user info to get role
-        const userResponse = await axios.get('http://localhost:8000/api/users/profile/', {
+        const userResponse = await axios.get(`${apiBaseUrl}/api/users/profile/`, {
           headers: { Authorization: 'Bearer ' + response.data.access }
         })
         const user = userResponse.data
