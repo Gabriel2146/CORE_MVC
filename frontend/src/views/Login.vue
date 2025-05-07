@@ -11,9 +11,10 @@
         <input id="password" type="password" v-model="password" required />
       </div>
       <button type="submit">Entrar</button>
-    </form>
-    <p v-if="error" class="error">{{ error }}</p>
-  </div>
+  </form>
+  <p v-if="error" class="error">{{ error }}</p>
+  <p>¿No tienes cuenta? <router-link to="/register">Regístrate aquí</router-link></p>
+</div>
 </template>
 
 <script>
