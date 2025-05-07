@@ -41,10 +41,10 @@ export default {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access
 
         // Fetch user info to get role
-        const userResponse = await axios.get('http://localhost:8000/api/users/list/', {
+        const userResponse = await axios.get('http://localhost:8000/api/users/profile/', {
           headers: { Authorization: 'Bearer ' + response.data.access }
         })
-        const user = userResponse.data.find(u => u.username === username.value)
+        const user = userResponse.data
         if (user) {
           localStorage.setItem('user_role', user.role)
           // Redirect based on role
