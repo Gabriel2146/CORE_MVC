@@ -1,18 +1,23 @@
 <template>
   <div>
-    <h1>Panel de Invitado</h1>
-    <p>Bienvenido, invitado. Tienes acceso limitado a contenido público.</p>
+    <h2>Panel de Invitado</h2>
+    <LogoutButton />
+    <!-- contenido del panel -->
   </div>
 </template>
 
 <script>
+import LogoutButton from './LogoutButton.vue'
+
 export default {
-  name: 'Guest'
+  components: {
+    LogoutButton
+  }
 }
 </script>
 
 <style scoped>
-h1 {
-  color: #95a5a6;
+h2 {
+  color: #7f8c8d;
 }
 </style>

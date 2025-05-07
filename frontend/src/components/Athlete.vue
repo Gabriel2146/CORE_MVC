@@ -1,18 +1,23 @@
 <template>
   <div>
-    <h1>Panel de Deportista</h1>
-    <p>Bienvenido, deportista. Aquí puedes recibir planes y registrar tus avances.</p>
+    <h2>Panel de Deportista</h2>
+    <LogoutButton />
+    <!-- contenido del panel -->
   </div>
 </template>
 
 <script>
+import LogoutButton from './LogoutButton.vue'
+
 export default {
-  name: 'Athlete'
+  components: {
+    LogoutButton
+  }
 }
 </script>
 
 <style scoped>
-h1 {
+h2 {
   color: #27ae60;
 }
 </style>

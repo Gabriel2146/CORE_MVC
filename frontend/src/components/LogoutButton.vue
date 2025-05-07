@@ -1,15 +1,12 @@
 <template>
-  <div>
-    <h1>Bienvenido a la Plataforma de Entrenamiento</h1>
-    <button @click="logout">Cerrar Sesión</button>
-  </div>
+  <button @click="logout" class="logout-button">Cerrar Sesión</button>
 </template>
 
 <script>
 import { useRouter } from 'vue-router'
 
 export default {
-  name: 'Home',
+  name: 'LogoutButton',
   setup() {
     const router = useRouter()
 
@@ -26,16 +23,18 @@ export default {
 </script>
 
 <style scoped>
-button {
+.logout-button {
   margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #c0392b;
+  padding: 0.4rem 1rem;
+  background-color: #3498db;
   color: white;
-  border: none;
+  border: 1px solid #2980b9;
   border-radius: 4px;
   cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
 }
-button:hover {
-  background-color: #e74c3c;
+.logout-button:hover {
+  background-color: #2980b9;
 }
 </style>

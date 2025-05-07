@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1>Panel de Entrenador</h1>
+    <LogoutButton />
     <p>Bienvenido, entrenador. Aquí puedes diseñar planes y monitorear el progreso de tus deportistas.</p>
     <button @click="generatePlan">Generar Plan de Entrenamiento</button>
     <div v-if="plan">
@@ -20,9 +21,13 @@
 
 <script>
 import axios from 'axios'
+import LogoutButton from './LogoutButton.vue'
 
 export default {
   name: 'Trainer',
+  components: {
+    LogoutButton
+  },
   data() {
     return {
       plan: null,
