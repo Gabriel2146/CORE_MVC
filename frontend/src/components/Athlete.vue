@@ -1,16 +1,18 @@
 <template>
   <div>
-    <h1>Athlete Dashboard</h1>
-    <p>View assigned plans and record progress here.</p>
+    <h1>Panel de Deportista</h1>
+    <p>Bienvenido, deportista. Aquí puedes recibir planes y registrar tus avances.</p>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Athlete',
+  name: 'Athlete'
 }
 </script>
 
 <style scoped>
-/* Styles for Athlete component */
+h1 {
+  color: #27ae60;
+}
 </style>

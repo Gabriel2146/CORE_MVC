@@ -19,6 +19,7 @@
 <script>
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { ref } from 'vue'
 
 export default {
   name: 'Login',
@@ -37,7 +38,34 @@ export default {
         localStorage.setItem('access_token', response.data.access)
         localStorage.setItem('refresh_token', response.data.refresh)
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access
-        router.push('/')
+
+        // Fetch user info to get role
+        const userResponse = await axios.get('http://localhost:8000/api/users/list/', {
+          headers: { Authorization: 'Bearer ' + response.data.access }
+        })
+        const user = userResponse.data.find(u => u.username === username.value)
+        if (user) {
+          localStorage.setItem('user_role', user.role)
+          // Redirect based on role
+          switch (user.role) {
+            case 'admin':
+              router.push('/admin')
+              break
+            case 'trainer':
+              router.push('/trainer')
+              break
+            case 'athlete':
+              router.push('/athlete')
+              break
+            case 'guest':
+              router.push('/guest')
+              break
+            default:
+              router.push('/')
+          }
+        } else {
+          router.push('/')
+        }
       } catch (err) {
         error.value = 'Credenciales inválidas'
       }

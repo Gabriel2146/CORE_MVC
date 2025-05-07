@@ -1,16 +1,18 @@
 <template>
   <div>
-    <h1>Guest Access</h1>
-    <p>Limited access to public content.</p>
+    <h1>Panel de Invitado</h1>
+    <p>Bienvenido, invitado. Tienes acceso limitado a contenido público.</p>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Guest',
+  name: 'Guest'
 }
 </script>
 
 <style scoped>
-/* Styles for Guest component */
+h1 {
+  color: #95a5a6;
+}
 </style>
