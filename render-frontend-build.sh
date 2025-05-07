@@ -1,4 +1,5 @@
 #!/bin/bash
 cd frontend
 npm install
-npm run build
+chmod +x ./node_modules/.bin/vite
+npx vite build
