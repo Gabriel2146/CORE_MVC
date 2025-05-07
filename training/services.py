@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta
 
+from datetime import datetime, timedelta
+from .models import Exercise
+
 class TrainingPlanGenerator:
     def __init__(self, user_profile, training_history, objectives):
         self.user_profile = user_profile
@@ -22,25 +25,20 @@ class TrainingPlanGenerator:
         days_available = self.user_profile.availability if hasattr(self.user_profile, 'availability') else ['Monday', 'Wednesday', 'Friday']
         objective_type = self.objectives.get('type', 'strength')
 
-        exercises_map = {
-            "strength": [
-                {"name": "Deadlift", "sets": 4, "reps": 6},
-                {"name": "Bench Press", "sets": 4, "reps": 8},
-                {"name": "Squats", "sets": 4, "reps": 8}
-            ],
-            "endurance": [
-                {"name": "Running", "sets": 1, "reps": 30},
-                {"name": "Cycling", "sets": 1, "reps": 45},
-                {"name": "Jump Rope", "sets": 3, "reps": 60}
-            ],
-            "flexibility": [
-                {"name": "Yoga", "sets": 1, "reps": 60},
-                {"name": "Stretching", "sets": 1, "reps": 20},
-                {"name": "Pilates", "sets": 1, "reps": 45}
-            ]
-        }
+        # Fetch exercises from DB based on objective_type and other criteria
+        exercises = Exercise.objects.filter(category__icontains=objective_type)
 
-        selected_exercises = exercises_map.get(objective_type, exercises_map["strength"])
+        # If no exercises found, fallback to all exercises
+        if not exercises.exists():
+            exercises = Exercise.objects.all()
+
+        selected_exercises = []
+        for exercise in exercises[:3]:  # select first 3 exercises for simplicity
+            selected_exercises.append({
+                "name": exercise.name,
+                "sets": 4,
+                "reps": 8
+            })
 
         sessions = []
         start_date = datetime.now().date()

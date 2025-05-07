@@ -6,6 +6,8 @@ import Admin from '../components/Admin.vue'
 import Trainer from '../components/Trainer.vue'
 import Athlete from '../components/Athlete.vue'
 import Guest from '../components/Guest.vue'
+import TrainingPlanList from '../components/TrainingPlanList.vue'
+import TrainingPlanCreate from '../components/TrainingPlanCreate.vue'
 
 const routes = [
   {
@@ -47,6 +49,18 @@ const routes = [
     name: 'Guest',
     component: Guest,
     meta: { requiresAuth: true, role: 'guest' }
+  },
+  {
+    path: '/training-plans',
+    name: 'TrainingPlanList',
+    component: TrainingPlanList,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/training-plan/create',
+    name: 'TrainingPlanCreate',
+    component: TrainingPlanCreate,
+    meta: { requiresAuth: true }
   }
 ]
 

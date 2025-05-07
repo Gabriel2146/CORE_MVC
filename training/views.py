@@ -13,9 +13,14 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 class TrainingPlanViewSet(viewsets.ModelViewSet):
-    queryset = TrainingPlan.objects.all()
     serializer_class = TrainingPlanSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'admin':
+            return TrainingPlan.objects.all()
+        return TrainingPlan.objects.filter(user=user)
 
     @action(detail=False, methods=['post'], permission_classes=[IsTrainer])
     def generate(self, request):
