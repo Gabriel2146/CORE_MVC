@@ -1,8 +1,4 @@
 #!/bin/bash
-# Script to build Vue frontend for Render deployment
-
-echo "Installing frontend dependencies..."
+cd frontend
 npm install
-
-echo "Building frontend for production..."
 npm run build
