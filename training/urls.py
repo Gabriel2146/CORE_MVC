@@ -4,7 +4,7 @@ from .views import ExerciseViewSet, TrainingPlanViewSet, TrainingSessionViewSet,
 
 router = DefaultRouter()
 router.register(r'exercises', ExerciseViewSet)
-router.register(r'training-plans', TrainingPlanViewSet)
+router.register(r'training-plans', TrainingPlanViewSet, basename='trainingplan')
 router.register(r'training-sessions', TrainingSessionViewSet)
 router.register(r'exercise-entries', ExerciseEntryViewSet)
 

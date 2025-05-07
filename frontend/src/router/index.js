@@ -12,6 +12,18 @@ import TrainingPlanCreate from '../components/TrainingPlanCreate.vue'
 const routes = [
   {
     path: '/',
+    name: 'LoginRedirect',
+    beforeEnter: (to, from, next) => {
+      const token = localStorage.getItem('access_token')
+      if (token) {
+        next({ name: 'Login' })
+      } else {
+        next({ name: 'Home' })
+      }
+    }
+  },
+  {
+    path: '/home',
     name: 'Home',
     component: Home,
     meta: { requiresAuth: true }
