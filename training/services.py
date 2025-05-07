@@ -9,10 +9,10 @@ class TrainingPlanGenerator:
     def collect_profile_data(self):
         # Extract relevant profile data such as physical info, condition level, restrictions, availability
         profile_data = {
-            'physical_info': self.user_profile.physical_info,
-            'condition_level': self.user_profile.condition_level,
-            'restrictions': self.user_profile.restrictions,
-            'availability': self.user_profile.availability,
+            'physical_info': getattr(self.user_profile, 'physical_info', None),
+            'condition_level': getattr(self.user_profile, 'condition_level', None),
+            'restrictions': getattr(self.user_profile, 'restrictions', None),
+            'availability': getattr(self.user_profile, 'availability', None),
         }
         return profile_data
 
@@ -27,7 +27,11 @@ class TrainingPlanGenerator:
             'sessions': [
                 {
                     'date': datetime.now().date(),
-                    'exercises': ['exercise1', 'exercise2']
+                    'exercises': ['Push-ups', 'Squats']
+                },
+                {
+                    'date': (datetime.now() + timedelta(days=2)).date(),
+                    'exercises': ['Pull-ups', 'Lunges']
                 }
             ]
         }
