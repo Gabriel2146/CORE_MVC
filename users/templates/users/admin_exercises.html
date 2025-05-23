@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gestión de Ejercicios - Admin</title>
+</head>
+<body>
+    <h1>Gestión de Ejercicios</h1>
+    <ul>
+        {% for exercise in exercises %}
+            <li>{{ exercise.name }} - {{ exercise.category }}</li>
+        {% empty %}
+            <li>No hay ejercicios registrados.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'users:dashboard' %}">Volver al Dashboard</a>
+</body>
+</html>
