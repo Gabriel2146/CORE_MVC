@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if form.instance.pk %}Editar Ejercicio{% else %}Crear Ejercicio{% endif %}</title>
+</head>
+<body>
+    <h1>{% if form.instance.pk %}Editar Ejercicio{% else %}Crear Ejercicio{% endif %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar</button>
+    </form>
+    <a href="{% url 'users:admin_exercises' %}">Volver a la lista de ejercicios</a>
+</body>
+</html>

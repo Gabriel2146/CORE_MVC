@@ -1,11 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Gestionar Ejercicios - Administrador</title>
+    <title>Gestión de Ejercicios - Administrador</title>
 </head>
 <body>
-    <h1>Gestionar Ejercicios</h1>
-    <p>Contenido para administrar ejercicios.</p>
-    <a href="{% url 'users:dashboard' %}">Volver al Dashboard</a>
+    <h1>Gestión de Ejercicios</h1>
+    <p><a href="{% url 'users:dashboard' %}">Volver al Dashboard</a></p>
+    <p><a href="{% url 'users:admin_exercise_create' %}">Crear Nuevo Ejercicio</a></p>
+    <p><a href="{% url 'users:sync_wger_exercises' %}">Sincronizar Ejercicios desde wger</a></p>
+    <table border="1" cellpadding="5" cellspacing="0">
+        <thead>
+            <tr>
+                <th>ID wger</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Equipamiento</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exercise in exercises %}
+            <tr>
+                <td>{{ exercise.wger_id }}</td>
+                <td>{{ exercise.name }}</td>
+                <td>{{ exercise.description|safe }}</td>
+                <td>{{ exercise.category }}</td>
+                <td>{{ exercise.equipment }}</td>
+                <td>
+                    <a href="{% url 'users:admin_exercise_edit' exercise.pk %}">Editar</a> |
+                    <a href="{% url 'users:admin_exercise_delete' exercise.pk %}">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No hay ejercicios disponibles.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>

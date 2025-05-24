@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Eliminar Plan de Entrenamiento</title>
+</head>
+<body>
+    <h1>Eliminar Plan de Entrenamiento</h1>
+    <p>¿Estás seguro de que deseas eliminar el plan "{{ plan.name }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Confirmar eliminación</button>
+    </form>
+    <a href="{% url 'users:admin_training_plans' %}">Cancelar</a>
+</body>
+</html>

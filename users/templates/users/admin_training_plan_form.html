@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if form.instance.pk %}Editar Plan de Entrenamiento{% else %}Crear Plan de Entrenamiento{% endif %}</title>
+</head>
+<body>
+    <h1>{% if form.instance.pk %}Editar Plan de Entrenamiento{% else %}Crear Plan de Entrenamiento{% endif %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar</button>
+    </form>
+    <a href="{% url 'users:admin_training_plans' %}">Volver a la lista de planes</a>
+</body>
+</html>

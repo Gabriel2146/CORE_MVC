@@ -5,6 +5,67 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from .forms import CustomUserCreationForm
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from training.forms import ExerciseForm, TrainingPlanForm
+from training.models import TrainingPlan
+from wger_integration.models import WgerExercise
+from .models import User
+from .forms import CustomUserCreationForm
+from django.contrib.auth.forms import UserChangeForm
+import subprocess
+from django.contrib import messages
+
+@login_required
+@csrf_exempt
+def admin_users(request):
+    user = request.user
+    if user.role != 'admin':
+        raise PermissionDenied
+    users = User.objects.all()
+    return render(request, 'users/admin_users.html', {'users': users})
+
+@login_required
+@csrf_exempt
+def admin_user_create(request):
+    user = request.user
+    if user.role != 'admin':
+        raise PermissionDenied
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('users:admin_users')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'users/admin_user_form.html', {'form': form})
+
+@login_required
+@csrf_exempt
+def admin_user_edit(request, pk):
+    user = request.user
+    if user.role != 'admin':
+        raise PermissionDenied
+    user_obj = get_object_or_404(User, pk=pk)
+    if request.method == 'POST':
+        form = UserChangeForm(request.POST, instance=user_obj)
+        if form.is_valid():
+            form.save()
+            return redirect('users:admin_users')
+    else:
+        form = UserChangeForm(instance=user_obj)
+    return render(request, 'users/admin_user_form.html', {'form': form})
+
+@login_required
+@csrf_exempt
+def admin_user_delete(request, pk):
+    user = request.user
+    if user.role != 'admin':
+        raise PermissionDenied
+    user_obj = get_object_or_404(User, pk=pk)
+    if request.method == 'POST':
+        user_obj.delete()
+        return redirect('users:admin_users')
+    return render(request, 'users/admin_user_confirm_delete.html', {'user_obj': user_obj})
 
 def user_login(request):
     if request.method == 'POST':
@@ -52,7 +113,65 @@ def admin_exercises(request):
     user = request.user
     if user.role != 'admin':
         raise PermissionDenied
-    return render(request, 'users/admin_exercises.html')
+    exercises = WgerExercise.objects.all()
+    return render(request, 'users/admin_exercises.html', {'exercises': exercises})
+
+@login_required
+@csrf_exempt
+def sync_wger_exercises(request):
+    user = request.user
+    if user.role != 'admin':
+        raise PermissionDenied
+    try:
+        # Ejecutar el comando de gestión para sincronizar ejercicios
+        subprocess.run(['python', 'manage.py', 'sync_wger_exercises'], check=True)
+        messages.success(request, 'Sincronización de ejercicios completada con éxito.')
+    except subprocess.CalledProcessError:
+        messages.error(request, 'Error durante la sincronización de ejercicios.')
+    return redirect('users:admin_exercises')
+
+@login_required
+@csrf_exempt
+def admin_exercise_create(request):
+    user = request.user
+    if user.role != 'admin':
+        raise PermissionDenied
+    if request.method == 'POST':
+        form = ExerciseForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('users:admin_exercises')
+    else:
+        form = ExerciseForm()
+    return render(request, 'users/admin_exercise_form.html', {'form': form})
+
+@login_required
+@csrf_exempt
+def admin_exercise_edit(request, pk):
+    user = request.user
+    if user.role != 'admin':
+        raise PermissionDenied
+    exercise = get_object_or_404(Exercise, pk=pk)
+    if request.method == 'POST':
+        form = ExerciseForm(request.POST, instance=exercise)
+        if form.is_valid():
+            form.save()
+            return redirect('users:admin_exercises')
+    else:
+        form = ExerciseForm(instance=exercise)
+    return render(request, 'users/admin_exercise_form.html', {'form': form})
+
+@login_required
+@csrf_exempt
+def admin_exercise_delete(request, pk):
+    user = request.user
+    if user.role != 'admin':
+        raise PermissionDenied
+    exercise = get_object_or_404(Exercise, pk=pk)
+    if request.method == 'POST':
+        exercise.delete()
+        return redirect('users:admin_exercises')
+    return render(request, 'users/admin_exercise_confirm_delete.html', {'exercise': exercise})
 
 @login_required
 @csrf_exempt
@@ -60,7 +179,51 @@ def admin_training_plans(request):
     user = request.user
     if user.role != 'admin':
         raise PermissionDenied
-    return render(request, 'users/admin_training_plans.html')
+    plans = TrainingPlan.objects.all()
+    return render(request, 'users/admin_training_plans.html', {'plans': plans})
+
+@login_required
+@csrf_exempt
+def admin_training_plan_create(request):
+    user = request.user
+    if user.role != 'admin':
+        raise PermissionDenied
+    if request.method == 'POST':
+        form = TrainingPlanForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('users:admin_training_plans')
+    else:
+        form = TrainingPlanForm()
+    return render(request, 'users/admin_training_plan_form.html', {'form': form})
+
+@login_required
+@csrf_exempt
+def admin_training_plan_edit(request, pk):
+    user = request.user
+    if user.role != 'admin':
+        raise PermissionDenied
+    plan = get_object_or_404(TrainingPlan, pk=pk)
+    if request.method == 'POST':
+        form = TrainingPlanForm(request.POST, instance=plan)
+        if form.is_valid():
+            form.save()
+            return redirect('users:admin_training_plans')
+    else:
+        form = TrainingPlanForm(instance=plan)
+    return render(request, 'users/admin_training_plan_form.html', {'form': form})
+
+@login_required
+@csrf_exempt
+def admin_training_plan_delete(request, pk):
+    user = request.user
+    if user.role != 'admin':
+        raise PermissionDenied
+    plan = get_object_or_404(TrainingPlan, pk=pk)
+    if request.method == 'POST':
+        plan.delete()
+        return redirect('users:admin_training_plans')
+    return render(request, 'users/admin_training_plan_confirm_delete.html', {'plan': plan})
 
 @login_required
 @csrf_exempt

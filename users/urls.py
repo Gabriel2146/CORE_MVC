@@ -16,11 +16,19 @@ urlpatterns = [
     path('profile-api/', UserProfileView.as_view(), name='user-profile'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    
+
     path('admin/exercises/', simple_views.admin_exercises, name='admin_exercises'),
+    path('admin/exercises/create/', simple_views.admin_exercise_create, name='admin_exercise_create'),
+    path('admin/exercises/edit/<int:pk>/', simple_views.admin_exercise_edit, name='admin_exercise_edit'),
+    path('admin/exercises/delete/<int:pk>/', simple_views.admin_exercise_delete, name='admin_exercise_delete'),
+    path('admin/exercises/sync/', simple_views.sync_wger_exercises, name='sync_wger_exercises'),
+
     path('admin/training-plans/', simple_views.admin_training_plans, name='admin_training_plans'),
+    path('admin/training-plans/create/', simple_views.admin_training_plan_create, name='admin_training_plan_create'),
+    path('admin/training-plans/edit/<int:pk>/', simple_views.admin_training_plan_edit, name='admin_training_plan_edit'),
+    path('admin/training-plans/delete/<int:pk>/', simple_views.admin_training_plan_delete, name='admin_training_plan_delete'),
+
     path('trainer/training-plans/', simple_views.trainer_training_plans, name='trainer_training_plans'),
     path('athlete/training-plans/', simple_views.athlete_training_plans, name='athlete_training_plans'),
     path('guest/content/', simple_views.guest_content, name='guest_content'),
-
 ]
