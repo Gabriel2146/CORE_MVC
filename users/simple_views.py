@@ -1,23 +1,22 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse
-from .forms import CustomUserCreationForm
-from training import models as training_models
-from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
+from .forms import CustomUserCreationForm
+from django.views.decorators.csrf import csrf_exempt
 
 def user_login(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
             login(request, user)
             return redirect('users:dashboard')
-    else:
-        form = AuthenticationForm()
-    return render(request, 'users/login.html', {'form': form})
+        else:
+            return render(request, 'users/login.html', {'error': 'Credenciales inválidas'})
+    return render(request, 'users/login.html')
 
 def user_logout(request):
     logout(request)
@@ -36,53 +35,53 @@ def user_register(request):
 @login_required
 def dashboard(request):
     user = request.user
-    role = getattr(user, 'role', 'guest')
-    # Render different templates or content based on role
-    if role == 'admin':
-        return render(request, 'users/dashboard_admin.html', {'user': user})
-    elif role == 'trainer':
-        return render(request, 'users/dashboard_trainer.html', {'user': user})
-    elif role == 'athlete':
-        return render(request, 'users/dashboard_athlete.html', {'user': user})
+    if user.role == 'admin':
+        return render(request, 'users/dashboard_admin.html')
+    elif user.role == 'trainer':
+        return render(request, 'users/dashboard_trainer.html')
+    elif user.role == 'athlete':
+        return render(request, 'users/dashboard_athlete.html')
+    elif user.role == 'guest':
+        return render(request, 'users/dashboard_guest.html')
     else:
-        return render(request, 'users/dashboard_guest.html', {'user': user})
+        return HttpResponse("Rol no reconocido")
 
 @login_required
-@require_http_methods(["GET"])
+@csrf_exempt
 def admin_exercises(request):
-    if request.user.role != 'admin':
+    user = request.user
+    if user.role != 'admin':
         raise PermissionDenied
-    exercises = training_models.Exercise.objects.all()
-    return render(request, 'users/admin_exercises.html', {'exercises': exercises})
+    return render(request, 'users/admin_exercises.html')
 
 @login_required
-@require_http_methods(["GET"])
+@csrf_exempt
 def admin_training_plans(request):
-    if request.user.role != 'admin':
+    user = request.user
+    if user.role != 'admin':
         raise PermissionDenied
-    plans = training_models.TrainingPlan.objects.all()
-    return render(request, 'users/admin_training_plans.html', {'plans': plans})
+    return render(request, 'users/admin_training_plans.html')
 
 @login_required
-@require_http_methods(["GET"])
+@csrf_exempt
 def trainer_training_plans(request):
-    if request.user.role != 'trainer':
+    user = request.user
+    if user.role != 'trainer':
         raise PermissionDenied
-    plans = training_models.TrainingPlan.objects.filter(user=request.user)
-    return render(request, 'users/trainer_training_plans.html', {'plans': plans})
+    return render(request, 'users/trainer_training_plans.html')
 
 @login_required
-@require_http_methods(["GET"])
+@csrf_exempt
 def athlete_training_plans(request):
-    if request.user.role != 'athlete':
+    user = request.user
+    if user.role != 'athlete':
         raise PermissionDenied
-    plans = training_models.TrainingPlan.objects.filter(user=request.user)
-    return render(request, 'users/athlete_training_plans.html', {'plans': plans})
+    return render(request, 'users/athlete_training_plans.html')
 
 @login_required
-@require_http_methods(["GET"])
+@csrf_exempt
 def guest_content(request):
-    if request.user.role != 'guest':
+    user = request.user
+    if user.role != 'guest':
         raise PermissionDenied
-    exercises = training_models.Exercise.objects.all()
-    return render(request, 'users/guest_content.html', {'exercises': exercises})
+    return render(request, 'users/guest_content.html')
