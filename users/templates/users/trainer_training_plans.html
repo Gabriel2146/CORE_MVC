@@ -5,9 +5,14 @@
 </head>
 <body>
     <h1>Planes de Entrenamiento</h1>
+    <a href="{% url 'users:trainer_training_plan_create' %}">Crear Nuevo Plan</a>
     <ul>
         {% for plan in plans %}
-            <li>Plan: {{ plan.name }} - Usuario: {{ plan.user.username }}</li>
+            <li>
+                Plan: {{ plan.name }} - Deportista: {{ plan.user.username }}
+                <a href="{% url 'users:trainer_training_plan_edit' plan.pk %}">Editar</a> |
+                <a href="{% url 'users:trainer_training_plan_delete' plan.pk %}">Eliminar</a>
+            </li>
         {% empty %}
             <li>No hay planes asignados.</li>
         {% endfor %}

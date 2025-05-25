@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mis Ejercicios - Deportista</title>
+</head>
+<body>
+    <h1>Mis Ejercicios</h1>
+    <form method="get">
+        <input type="text" name="q" placeholder="Buscar por nombre" value="{{ query }}">
+        <input type="text" name="category" placeholder="Categoría" value="{{ category }}">
+        <button type="submit">Filtrar</button>
+    </form>
+    <table border="1" cellpadding="5" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th>ID wger</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exercise in exercises %}
+            <tr>
+                <td>{{ exercise.type|title }}</td>
+                <td>{{ exercise.obj.wger_id }}</td>
+                <td>{{ exercise.obj.name }}</td>
+                <td>{{ exercise.obj.category }}</td>
+                <td><a href="{% url 'users:exercise_detail' exercise.type exercise.obj.pk %}">Ver detalle</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">No hay ejercicios asignados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'users:dashboard' %}">Volver al Dashboard</a>
+</body>
+</html>

@@ -22,14 +22,20 @@
         <tbody>
             {% for exercise in exercises %}
             <tr>
-                <td>{{ exercise.wger_id }}</td>
-                <td>{{ exercise.name }}</td>
-                <td>{{ exercise.description|safe }}</td>
-                <td>{{ exercise.category }}</td>
-                <td>{{ exercise.equipment }}</td>
+                <td>{{ exercise.obj.wger_id }}</td>
+                <td>{{ exercise.obj.name }}</td>
+                <td>{{ exercise.obj.description|safe }}</td>
+                <td>{{ exercise.obj.category }}</td>
+                <td>{{ exercise.obj.equipment }}</td>
                 <td>
-                    <a href="{% url 'users:admin_exercise_edit' exercise.pk %}">Editar</a> |
-                    <a href="{% url 'users:admin_exercise_delete' exercise.pk %}">Eliminar</a>
+                    {% if exercise.type == 'local' %}
+                        <a href="{% url 'users:admin_exercise_edit' exercise.obj.pk %}?type=local">Editar</a> |
+                        <a href="{% url 'users:admin_exercise_delete' exercise.obj.pk %}?type=local">Eliminar</a>
+                    {% else %}
+                        <!-- Optionally allow editing wger exercises, but usually only delete is allowed -->
+                        <span style="color:gray;">Editar</span> |
+                        <a href="{% url 'users:admin_exercise_delete' exercise.obj.pk %}?type=wger">Eliminar</a>
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}

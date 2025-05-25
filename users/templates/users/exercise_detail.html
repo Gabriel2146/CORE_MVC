@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detalle de Ejercicio</title>
+</head>
+<body>
+    <h1>Detalle de Ejercicio</h1>
+    <p><strong>Tipo:</strong> {{ type|title }}</p>
+    <p><strong>ID wger:</strong> {{ exercise.wger_id }}</p>
+    <p><strong>Nombre:</strong> {{ exercise.name }}</p>
+    <p><strong>Categoría:</strong> {{ exercise.category }}</p>
+    <p><strong>Grupo muscular:</strong> {{ exercise.muscle_group }}</p>
+    <p><strong>Dificultad:</strong> {{ exercise.difficulty }}</p>
+    <p><strong>Equipamiento:</strong> {{ exercise.equipment }}</p>
+    <p><strong>Descripción:</strong><br> {{ exercise.description|safe }}</p>
+    <a href="javascript:history.back()">Volver</a>
+</body>
+</html>

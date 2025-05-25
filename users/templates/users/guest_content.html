@@ -7,7 +7,7 @@
     <h1>Contenido Público</h1>
     <ul>
         {% for exercise in exercises %}
-            <li>{{ exercise.name }} - {{ exercise.category }}</li>
+            <li>{{ exercise.obj.name }} - {{ exercise.obj.category }} ({{ exercise.type|title }})</li>
         {% empty %}
             <li>No hay contenido público disponible.</li>
         {% endfor %}

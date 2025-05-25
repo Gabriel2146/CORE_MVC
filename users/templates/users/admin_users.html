@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gestión de Usuarios - Administrador</title>
+</head>
+<body>
+    <h1>Gestión de Usuarios</h1>
+    <a href="{% url 'users:dashboard' %}">Volver al Dashboard</a>
+    <a href="{% url 'users:admin_user_create' %}">Crear Nuevo Usuario</a>
+    <table border="1" cellpadding="5" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.get_role_display }}</td>
+                <td>
+                    <a href="{% url 'users:admin_user_edit' user.pk %}">Editar</a> |
+                    <a href="{% url 'users:admin_user_delete' user.pk %}">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No hay usuarios registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

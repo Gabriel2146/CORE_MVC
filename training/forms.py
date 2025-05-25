@@ -1,5 +1,5 @@
 from django import forms
-from .models import Exercise, TrainingPlan
+from .models import Exercise, TrainingPlan, ProgressEntry
 
 class ExerciseForm(forms.ModelForm):
     class Meta:
@@ -9,4 +9,9 @@ class ExerciseForm(forms.ModelForm):
 class TrainingPlanForm(forms.ModelForm):
     class Meta:
         model = TrainingPlan
-        fields = ['user', 'name', 'goals']
+        fields = ['user', 'trainer', 'name', 'goals']
+
+class ProgressEntryForm(forms.ModelForm):
+    class Meta:
+        model = ProgressEntry
+        fields = ['exercise', 'sets', 'reps', 'weight', 'notes']

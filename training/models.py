@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from users.models import User
 
 class Exercise(models.Model):
     wger_id = models.IntegerField(unique=True)
@@ -11,10 +12,11 @@ class Exercise(models.Model):
     equipment = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 class TrainingPlan(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='training_plans')
+    trainer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='trainer_plans')
     name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -29,7 +31,7 @@ class TrainingSession(models.Model):
     notes = models.TextField(blank=True)
 
     def __str__(self):
-        return f"Session on {self.date} for {self.training_plan.name}"
+        return "Session on " + str(self.date) + " for " + str(self.training_plan)
 
 class ExerciseEntry(models.Model):
     session = models.ForeignKey(TrainingSession, on_delete=models.CASCADE, related_name='exercise_entries')
@@ -39,4 +41,16 @@ class ExerciseEntry(models.Model):
     weight = models.FloatField(default=0.0)
 
     def __str__(self):
-        return f"{self.exercise.name} in session {self.session.id}"
+        return str(self.exercise) + " in session " + str(self.session)
+
+class ProgressEntry(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='progress_entries')
+    exercise = models.CharField(max_length=255)
+    date = models.DateField(auto_now_add=True)
+    sets = models.IntegerField(default=0)
+    reps = models.IntegerField(default=0)
+    weight = models.FloatField(default=0.0)
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.exercise} ({self.date})"

@@ -21,6 +21,8 @@ urlpatterns = [
     path('admin/exercises/create/', simple_views.admin_exercise_create, name='admin_exercise_create'),
     path('admin/exercises/edit/<int:pk>/', simple_views.admin_exercise_edit, name='admin_exercise_edit'),
     path('admin/exercises/delete/<int:pk>/', simple_views.admin_exercise_delete, name='admin_exercise_delete'),
+    path('admin/exercises/edit/<str:type>/<int:pk>/', simple_views.admin_exercise_edit, name='admin_exercise_edit'),
+    path('admin/exercises/delete/<str:type>/<int:pk>/', simple_views.admin_exercise_delete, name='admin_exercise_delete'),
     path('admin/exercises/sync/', simple_views.sync_wger_exercises, name='sync_wger_exercises'),
 
     path('admin/training-plans/', simple_views.admin_training_plans, name='admin_training_plans'),
@@ -29,6 +31,20 @@ urlpatterns = [
     path('admin/training-plans/delete/<int:pk>/', simple_views.admin_training_plan_delete, name='admin_training_plan_delete'),
 
     path('trainer/training-plans/', simple_views.trainer_training_plans, name='trainer_training_plans'),
+    path('trainer/training-plans/create/', simple_views.trainer_training_plan_create, name='trainer_training_plan_create'),
+    path('trainer/training-plans/edit/<int:pk>/', simple_views.trainer_training_plan_edit, name='trainer_training_plan_edit'),
+    path('trainer/training-plans/delete/<int:pk>/', simple_views.trainer_training_plan_delete, name='trainer_training_plan_delete'),
+
     path('athlete/training-plans/', simple_views.athlete_training_plans, name='athlete_training_plans'),
     path('guest/content/', simple_views.guest_content, name='guest_content'),
+
+    path('trainer/exercises/', simple_views.trainer_exercises, name='trainer_exercises'),
+    path('athlete/exercises/', simple_views.athlete_exercises, name='athlete_exercises'),
+    path('exercise/<str:exercise_type>/<int:pk>/', simple_views.exercise_detail, name='exercise_detail'),
+    path('athlete/progress/', simple_views.athlete_progress, name='athlete_progress'),
+
+    path('admin/users/', simple_views.admin_users, name='admin_users'),
+    path('admin/users/create/', simple_views.admin_user_create, name='admin_user_create'),
+    path('admin/users/edit/<int:pk>/', simple_views.admin_user_edit, name='admin_user_edit'),
+    path('admin/users/delete/<int:pk>/', simple_views.admin_user_delete, name='admin_user_delete'),
 ]

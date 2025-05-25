@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Progreso Personal - Deportista</title>
+</head>
+<body>
+    <h1>Mi Progreso</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Registrar Progreso</button>
+    </form>
+    <h2>Historial de Progreso</h2>
+    <table border="1" cellpadding="5" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Ejercicio</th>
+                <th>Series</th>
+                <th>Repeticiones</th>
+                <th>Peso</th>
+                <th>Notas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in progress_entries %}
+            <tr>
+                <td>{{ entry.date }}</td>
+                <td>{{ entry.exercise }}</td>
+                <td>{{ entry.sets }}</td>
+                <td>{{ entry.reps }}</td>
+                <td>{{ entry.weight }}</td>
+                <td>{{ entry.notes }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No hay registros de progreso.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'users:dashboard' %}">Volver al Dashboard</a>
+</body>
+</html>

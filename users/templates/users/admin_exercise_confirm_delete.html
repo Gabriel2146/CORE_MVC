@@ -5,7 +5,10 @@
 </head>
 <body>
     <h1>Eliminar Ejercicio</h1>
-    <p>¿Estás seguro de que deseas eliminar el ejercicio "{{ exercise.name }}"?</p>
+    <p>¿Estás seguro de que deseas eliminar el ejercicio "{{ exercise.name }}"?
+        {% if type == 'wger' %}<br><em>(Este ejercicio es importado de wger)</em>{% endif %}
+        {% if type == 'local' %}<br><em>(Este ejercicio es local)</em>{% endif %}
+    </p>
     <form method="post">
         {% csrf_token %}
         <button type="submit">Confirmar eliminación</button>
