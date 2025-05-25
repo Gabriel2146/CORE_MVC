@@ -47,4 +47,7 @@ urlpatterns = [
     path('admin/users/create/', simple_views.admin_user_create, name='admin_user_create'),
     path('admin/users/edit/<int:pk>/', simple_views.admin_user_edit, name='admin_user_edit'),
     path('admin/users/delete/<int:pk>/', simple_views.admin_user_delete, name='admin_user_delete'),
+
+    path('trainer/athlete-progress/', simple_views.trainer_athlete_progress, name='trainer_athlete_progress'),
+    path('trainer/athlete-progress/<int:athlete_id>/', simple_views.trainer_athlete_progress, name='trainer_athlete_progress_detail'),
 ]

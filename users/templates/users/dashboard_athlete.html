@@ -6,6 +6,11 @@
 <body>
     <h1>Bienvenido, {{ user.username }} (Deportista)</h1>
     <p>Panel de deportista.</p>
-    <a href="{% url 'users:logout' %}">Cerrar sesión</a>
+    <ul>
+        <li><a href="{% url 'users:athlete_training_plans' %}">Mis Planes de Entrenamiento</a></li>
+        <li><a href="{% url 'users:athlete_exercises' %}">Mis Ejercicios</a></li>
+        <li><a href="{% url 'users:athlete_progress' %}">Mi Progreso</a></li>
+        <li><a href="{% url 'users:logout' %}">Cerrar sesión</a></li>
+    </ul>
 </body>
 </html>

@@ -319,7 +319,8 @@ def athlete_training_plans(request):
     user = request.user
     if user.role != 'athlete':
         raise PermissionDenied
-    return render(request, 'users/athlete_training_plans.html')
+    plans = TrainingPlan.objects.filter(user=user)
+    return render(request, 'users/athlete_training_plans.html', {'plans': plans})
 
 @login_required
 @csrf_exempt
@@ -409,7 +410,6 @@ def exercise_detail(request, exercise_type, pk):
     return render(request, 'users/exercise_detail.html', {'exercise': exercise, 'type': exercise_type})
 
 @login_required
-@csrf_exempt
 def athlete_progress(request):
     user = request.user
     if user.role != 'athlete':
@@ -425,3 +425,21 @@ def athlete_progress(request):
     else:
         form = ProgressEntryForm()
     return render(request, 'users/athlete_progress.html', {'form': form, 'progress_entries': progress_entries})
+
+@login_required
+def trainer_athlete_progress(request, athlete_id=None):
+    user = request.user
+    if user.role != 'trainer':
+        raise PermissionDenied
+    # Mostrar progreso de todos los deportistas que tienen un plan asignado a este entrenador
+    athletes = User.objects.filter(training_plans__trainer=user, role='athlete').distinct()
+    selected_athlete = None
+    progress_entries = None
+    if athlete_id:
+        selected_athlete = get_object_or_404(User, pk=athlete_id, role='athlete')
+        progress_entries = ProgressEntry.objects.filter(user=selected_athlete).order_by('-date')
+    return render(request, 'users/trainer_athlete_progress.html', {
+        'athletes': athletes,
+        'selected_athlete': selected_athlete,
+        'progress_entries': progress_entries
+    })

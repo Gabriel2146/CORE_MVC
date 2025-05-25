@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Progreso de Deportistas</title>
+</head>
+<body>
+    <h1>Progreso de Deportistas</h1>
+    <form method="get" action="">
+        <label for="athlete">Selecciona un deportista:</label>
+        <select name="athlete_id" id="athlete" onchange="if(this.value) window.location.href='{% url 'users:trainer_athlete_progress_detail' 0 %}'.replace('0', this.value);">
+            <option value="">-- Selecciona --</option>
+            {% for athlete in athletes %}
+                <option value="{{ athlete.id }}" {% if selected_athlete and selected_athlete.id == athlete.id %}selected{% endif %}>{{ athlete.username }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    {% if selected_athlete %}
+        <h2>Progreso de {{ selected_athlete.username }}</h2>
+        <table border="1" cellpadding="5" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Ejercicio</th>
+                    <th>Fecha</th>
+                    <th>Series</th>
+                    <th>Repeticiones</th>
+                    <th>Peso</th>
+                    <th>Notas</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in progress_entries %}
+                <tr>
+                    <td>{{ entry.exercise }}</td>
+                    <td>{{ entry.date }}</td>
+                    <td>{{ entry.sets }}</td>
+                    <td>{{ entry.reps }}</td>
+                    <td>{{ entry.weight }}</td>
+                    <td>{{ entry.notes }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6">Sin registros de progreso.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    <a href="{% url 'users:dashboard' %}">Volver al Dashboard</a>
+</body>
+</html>

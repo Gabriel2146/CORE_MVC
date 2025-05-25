@@ -7,7 +7,8 @@
     <h1>Planes de Entrenamiento</h1>
     <ul>
         {% for plan in plans %}
-            <li>Plan: {{ plan.name }} - Usuario: {{ plan.user.username }}</li>
+            <li>Plan: {{ plan.name }} - Entrenador: {{ plan.trainer.username if plan.trainer }}
+            </li>
         {% empty %}
             <li>No tienes planes asignados.</li>
         {% endfor %}
