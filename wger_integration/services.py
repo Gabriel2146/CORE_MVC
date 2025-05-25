@@ -46,6 +46,16 @@ class WgerAPIClient:
                 names.append(name)
         return names
 
+    def fetch_exercise_by_id(self, exercise_id, language=2):
+        params = {
+            'language': language,
+            'status': 2
+        }
+        response = self.session.get(f"{WGER_API_URL}{exercise_id}/", params=params)
+        if response.status_code == 200:
+            return response.json()
+        return None
+
     def sync_exercises(self):
         offset = 0
         limit = 100
@@ -57,12 +67,18 @@ class WgerAPIClient:
             for item in results:
                 name = item.get('name', '')
                 description = item.get('description', '')
+                # Fallback to English if missing
+                if not name or not description:
+                    en_item = self.fetch_exercise_by_id(item.get('id'), language=1)
+                    if en_item:
+                        if not name:
+                            name = en_item.get('name', '')
+                        if not description:
+                            description = en_item.get('description', '')
                 category_id = item.get('category', None)
                 equipment_ids = item.get('equipment', [])
-
                 category_name = self.get_category_name(category_id) if category_id else ''
                 equipment_names = self.get_equipment_names(equipment_ids) if equipment_ids else []
-
                 WgerExercise.objects.update_or_create(
                     wger_id=item.get('id'),
                     defaults={
