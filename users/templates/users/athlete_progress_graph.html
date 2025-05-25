@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Progreso Gráfico</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Progreso de Métricas</h1>
+    <canvas id="progressChart" width="600" height="300"></canvas>
+    <script>
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ fechas|safe }},
+                datasets: [{
+                    label: 'Progreso',
+                    data: {{ valores|safe }},
+                    borderColor: 'blue',
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'Fecha' } },
+                    y: { title: { display: true, text: 'Valor' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

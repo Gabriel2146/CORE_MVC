@@ -6,6 +6,14 @@
 <body>
     <h1>Bienvenido, {{ user.username }} (Deportista)</h1>
     <p>Panel de deportista.</p>
+    <h2>Acciones rápidas</h2>
+    <ul>
+        <li><a href="{% url 'users:auto_generate_plan' %}">Generar plan automático</a></li>
+        <li><a href="{% url 'users:athlete_progress_graph' %}">Ver gráfico de progreso</a></li>
+        <li><a href="{% url 'users:athlete_training_plans' %}">Ver mis planes</a></li>
+        <li><a href="{% url 'users:athlete_exercises' %}">Ver mis ejercicios</a></li>
+        <li><a href="{% url 'users:athlete_progress' %}">Registrar progreso</a></li>
+    </ul>
     <ul>
         <li><a href="{% url 'users:athlete_training_plans' %}">Mis Planes de Entrenamiento</a></li>
         <li><a href="{% url 'users:athlete_exercises' %}">Mis Ejercicios</a></li>

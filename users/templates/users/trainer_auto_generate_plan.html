@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generar Plan Automático para Deportista</title>
+</head>
+<body>
+    <h1>Generar Plan Automático para Deportista</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="athlete_id">Selecciona un deportista:</label>
+        <select name="athlete_id" id="athlete_id" required>
+            <option value="">-- Selecciona --</option>
+            {% for athlete in athletes %}
+                <option value="{{ athlete.id }}" {% if selected_athlete and selected_athlete.id == athlete.id %}selected{% endif %}>{{ athlete.username }}</option>
+            {% endfor %}
+        </select><br><br>
+        <label for="objetivo">Objetivo:</label>
+        <select name="objetivo" id="objetivo">
+            <option value="General">General</option>
+            <option value="Fuerza">Fuerza</option>
+            <option value="Resistencia">Resistencia</option>
+            <option value="Básico">Básico</option>
+        </select><br><br>
+        <label for="dias">Días por semana:</label>
+        <input type="number" name="dias" id="dias" value="3" min="1" max="7"><br><br>
+        <button type="submit">Generar Sugerencia de Plan</button>
+    </form>
+    {% if plan %}
+        <hr>
+        <h2>Sugerencia de Plan</h2>
+        {% if mensaje %}
+            <div style="background: #ffeeba; color: #856404; border: 1px solid #ffeeba; padding: 10px; margin-bottom: 20px; border-radius: 5px;">
+                <strong>¡Atención!</strong> {{ mensaje }}
+            </div>
+        {% endif %}
+        <p><strong>Nombre:</strong> {{ plan.name }}</p>
+        <p><strong>Objetivo:</strong> {{ plan.goals }}</p>
+        <p><strong>Índice de efectividad:</strong> {{ effectiveness }}%</p>
+        <h3>Sesiones y ejercicios generados</h3>
+        {% if sesiones_info %}
+            {% for sesion in sesiones_info %}
+                <h4>Sesión (fecha): {{ sesion.fecha }}</h4>
+                <ul>
+                    {% for ej in sesion.ejercicios %}
+                        <li>{{ ej.nombre }} - {{ ej.sets }}x{{ ej.reps }}</li>
+                    {% empty %}
+                        <li>No hay ejercicios asignados.</li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        {% else %}
+            <p>No hay sesiones generadas.</p>
+        {% endif %}
+        {% if not asignado %}
+            <form method="post" style="margin-top:20px;">
+                {% csrf_token %}
+                <input type="hidden" name="athlete_id" value="{{ selected_athlete.id }}">
+                <input type="hidden" name="objetivo" value="{{ plan.goals }}">
+                <input type="hidden" name="dias" value="{{ sesiones_info|length }}">
+                <input type="hidden" name="action" value="assign">
+                <button type="submit" style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px;">Asignar este plan al deportista</button>
+            </form>
+        {% endif %}
+    {% endif %}
+    <a href="{% url 'users:dashboard' %}">Volver al Dashboard</a>
+</body>
+</html>

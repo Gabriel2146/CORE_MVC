@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plan Generado</title>
+</head>
+<body>
+    <h1>Plan de Entrenamiento Generado</h1>
+    {% if solo_preview %}
+        <div style="background: #ffeeba; color: #856404; border: 1px solid #ffeeba; padding: 10px; margin-bottom: 20px; border-radius: 5px;">
+            <strong>¡Atención!</strong> {{ mensaje }}
+        </div>
+    {% endif %}
+    <p><strong>Nombre:</strong> {{ plan.name }}</p>
+    <p><strong>Objetivo:</strong> {{ plan.goals }}</p>
+    <p><strong>Índice de efectividad:</strong> {{ effectiveness }}%</p>
+    {% if not solo_preview %}
+        <a href="{% url 'users:athlete_training_plans' %}">Ver mis planes</a>
+    {% endif %}
+    <h2>Sesiones y ejercicios generados</h2>
+    {% for sesion in sesiones_info %}
+        <h3>Sesión (fecha): {{ sesion.fecha }}</h3>
+        <ul>
+            {% for ej in sesion.ejercicios %}
+                <li>{{ ej.nombre }} - {{ ej.sets }}x{{ ej.reps }}</li>
+            {% empty %}
+                <li>No hay ejercicios asignados.</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</body>
+</html>

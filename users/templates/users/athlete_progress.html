@@ -7,7 +7,17 @@
     <h1>Mi Progreso</h1>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        <label for="exercise">Ejercicio:</label>
+        <select name="exercise" id="exercise" required>
+            <option value="">-- Selecciona ejercicio --</option>
+            {% for ex in ejercicios %}
+                <option value="{{ ex.id }}">{{ ex.name }}</option>
+            {% endfor %}
+        </select><br>
+        {{ form.sets.label_tag }} {{ form.sets }}<br>
+        {{ form.reps.label_tag }} {{ form.reps }}<br>
+        {{ form.weight.label_tag }} {{ form.weight }}<br>
+        {{ form.notes.label_tag }} {{ form.notes }}<br>
         <button type="submit">Registrar Progreso</button>
     </form>
     <h2>Historial de Progreso</h2>

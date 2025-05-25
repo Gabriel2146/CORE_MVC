@@ -1,5 +1,6 @@
 import requests
 from .models import WgerExercise
+from training.models import Exercise
 
 WGER_API_URL = "https://wger.de/api/v2/exercise/"
 WGER_CATEGORY_URL = "https://wger.de/api/v2/exercisecategory/"
@@ -57,8 +58,10 @@ class WgerAPIClient:
         return None
 
     def sync_exercises(self):
+        import time
         offset = 0
         limit = 100
+        # 1. Importar/actualizar en WgerExercise
         while True:
             data = self.fetch_exercises(limit=limit, offset=offset)
             results = data.get('results', [])
@@ -79,7 +82,7 @@ class WgerAPIClient:
                 equipment_ids = item.get('equipment', [])
                 category_name = self.get_category_name(category_id) if category_id else ''
                 equipment_names = self.get_equipment_names(equipment_ids) if equipment_ids else []
-                WgerExercise.objects.update_or_create(
+                wger_obj, _ = WgerExercise.objects.update_or_create(
                     wger_id=item.get('id'),
                     defaults={
                         'name': name,
@@ -91,3 +94,46 @@ class WgerAPIClient:
             offset += limit
             if not data.get('next'):
                 break
+        # 2. Rellenar nombres y descripciones usando la API oficial (como fill_wger_names)
+        import requests
+        base_url = 'https://wger.de/api/v2/exerciseinfo/'
+        for ex in WgerExercise.objects.all():
+            if ex.name and ex.description:
+                continue
+            url = f'{base_url}{ex.wger_id}/?language=2'
+            resp = requests.get(url)
+            if resp.status_code == 200:
+                data = resp.json()
+                name = ''
+                description = ''
+                for t in data.get('translations', []):
+                    if t.get('language') == 2:
+                        name = t.get('name', '')
+                        description = t.get('description', '')
+                        break
+                if not name or not description:
+                    for t in data.get('translations', []):
+                        if t.get('language') == 1:
+                            if not name:
+                                name = t.get('name', '')
+                            if not description:
+                                description = t.get('description', '')
+                if name:
+                    ex.name = name
+                if description:
+                    ex.description = description
+                ex.save()
+            time.sleep(0.1)  # Para evitar rate limit
+        # 3. Copiar a Exercise local
+        for w in WgerExercise.objects.all():
+            Exercise.objects.update_or_create(
+                wger_id=w.wger_id,
+                defaults={
+                    'name': w.name,
+                    'description': w.description,
+                    'category': w.category,
+                    'muscle_group': w.muscle_group,
+                    'difficulty': w.difficulty,
+                    'equipment': w.equipment,
+                }
+            )

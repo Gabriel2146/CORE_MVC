@@ -9,4 +9,5 @@ urlpatterns = [
     path('api/training/', include('training.urls')),
     path('api/wger/', include('wger_integration.urls')),
     path('', simple_views.user_login),
+    path('', include('users.urls')),
 ]

@@ -50,4 +50,8 @@ urlpatterns = [
 
     path('trainer/athlete-progress/', simple_views.trainer_athlete_progress, name='trainer_athlete_progress'),
     path('trainer/athlete-progress/<int:athlete_id>/', simple_views.trainer_athlete_progress, name='trainer_athlete_progress_detail'),
+
+    path('athlete/auto-generate-plan/', simple_views.auto_generate_plan, name='auto_generate_plan'),
+    path('athlete/progress-graph/', simple_views.athlete_progress_graph, name='athlete_progress_graph'),
+    path('trainer/auto-generate-plan/', simple_views.trainer_auto_generate_plan, name='trainer_auto_generate_plan'),
 ]
