@@ -6,6 +6,9 @@
 <body>
     <h1>Bienvenido, Invitado</h1>
     <p>Acceso limitado a contenido público.</p>
-    <a href="{% url 'users:login' %}">Iniciar sesión</a>
+    <ul>
+        <li><a href="{% url 'users:guest_content' %}">Catálogo Público de Ejercicios</a></li>
+        <li><a href="{% url 'users:login' %}">Iniciar sesión</a></li>
+    </ul>
 </body>
 </html>
