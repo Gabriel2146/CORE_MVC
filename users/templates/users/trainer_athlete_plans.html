@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Planes asignados a {{ athlete.username }}</h1>
+<ul>
+    {% for plan in plans %}
+        <li>
+            <strong>{{ plan.name }}</strong> ({{ plan.created_at|date:'Y-m-d' }}) - Objetivo: {{ plan.goals }}
+            <ul>
+                {% for fb in plan.feedbacks.all %}
+                    <li><em>{{ fb.user.username }}</em> ({{ fb.created_at|date:'Y-m-d H:i' }}): {{ fb.comment }}</li>
+                {% empty %}
+                    <li>No hay comentarios.</li>
+                {% endfor %}
+            </ul>
+        </li>
+    {% empty %}
+        <li>No hay planes asignados.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'trainer_athlete_progress' athlete.id %}">Volver</a>
+{% endblock %}

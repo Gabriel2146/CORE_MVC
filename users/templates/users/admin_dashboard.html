@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Panel de Administrador</h1>
+<div class="dashboard-metrics">
+    <h2>Métricas Generales</h2>
+    <ul>
+        <li>Usuarios: {{ total_users }}</li>
+        <li>Entrenadores: {{ total_trainers }}</li>
+        <li>Deportistas: {{ total_athletes }}</li>
+        <li>Planes de entrenamiento: {{ total_plans }}</li>
+        <li>Ejercicios: {{ total_exercises }}</li>
+    </ul>
+</div>
+<div class="dashboard-logs">
+    <h2>Historial de sincronización de ejercicios</h2>
+    <table class="table">
+        <thead>
+            <tr><th>Fecha</th><th>Acción</th><th>Detalle</th></tr>
+        </thead>
+        <tbody>
+        {% for log in sync_logs %}
+            <tr>
+                <td>{{ log.timestamp|date:'Y-m-d H:i' }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.detail }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="3">Sin registros de sincronización.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="dashboard-exports">
+    <h2>Exportar reportes</h2>
+    <ul>
+        <li><a href="{% url 'export_users_csv' %}">Exportar usuarios (CSV)</a></li>
+        <li><a href="{% url 'export_exercises_csv' %}">Exportar ejercicios (CSV)</a></li>
+        <li><a href="{% url 'export_plans_csv' %}">Exportar planes (CSV)</a></li>
+    </ul>
+</div>
+{% endblock %}

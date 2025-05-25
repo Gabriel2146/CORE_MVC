@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Progreso de {{ athlete.username }}</h1>
+<canvas id="progressChart" width="600" height="300"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var fechas = {{ fechas|safe }};
+    var valores = {{ valores|safe }};
+    var ctx = document.getElementById('progressChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: fechas,
+            datasets: [{
+                label: 'Progreso',
+                data: valores,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0.2
+            }]
+        },
+        options: {
+            scales: {
+                x: { title: { display: true, text: 'Fecha' } },
+                y: { title: { display: true, text: 'Valor' } }
+            }
+        }
+    });
+</script>
+<a href="{% url 'trainer_athlete_progress' %}">Volver</a>
+{% endblock %}

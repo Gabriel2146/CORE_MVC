@@ -1,5 +1,5 @@
 import requests
-from .models import WgerExercise
+from .models import WgerExercise, SyncLog
 from training.models import Exercise
 
 WGER_API_URL = "https://wger.de/api/v2/exercise/"
@@ -137,3 +137,4 @@ class WgerAPIClient:
                     'equipment': w.equipment,
                 }
             )
+        SyncLog.objects.create(action='sync', detail='Sincronización de ejercicios completada')

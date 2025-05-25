@@ -7,7 +7,21 @@
     <h1>Planes de Entrenamiento</h1>
     <ul>
         {% for plan in plans %}
-            <li>Plan: {{ plan.name }} - Entrenador: {% if plan.trainer %}{{ plan.trainer.username }}{% else %}Sin asignar{% endif %}
+            <li>
+                <strong>{{ plan.name }}</strong> ({{ plan.created_at|date:'Y-m-d' }}) - Objetivo: {{ plan.goals }}
+                <form method="post" style="margin-top:10px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="plan_id" value="{{ plan.id }}">
+                    <textarea name="comment" rows="2" placeholder="Deja tu comentario sobre este plan..." required></textarea>
+                    <button type="submit">Enviar feedback</button>
+                </form>
+                <ul>
+                    {% for fb in feedbacks|get_item:plan.id %}
+                        <li><em>{{ fb.user.username }}</em> ({{ fb.created_at|date:'Y-m-d H:i' }}): {{ fb.comment }}</li>
+                    {% empty %}
+                        <li>No hay comentarios.</li>
+                    {% endfor %}
+                </ul>
             </li>
         {% empty %}
             <li>No tienes planes asignados.</li>

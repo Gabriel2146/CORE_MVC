@@ -54,4 +54,13 @@ urlpatterns = [
     path('athlete/auto-generate-plan/', simple_views.auto_generate_plan, name='auto_generate_plan'),
     path('athlete/progress-graph/', simple_views.athlete_progress_graph, name='athlete_progress_graph'),
     path('trainer/auto-generate-plan/', simple_views.trainer_auto_generate_plan, name='trainer_auto_generate_plan'),
+
+    path('admin/dashboard/', simple_views.admin_dashboard, name='admin_dashboard'),
+
+    path('admin/export/users/', simple_views.export_users_csv, name='export_users_csv'),
+    path('admin/export/exercises/', simple_views.export_exercises_csv, name='export_exercises_csv'),
+    path('admin/export/plans/', simple_views.export_plans_csv, name='export_plans_csv'),
+
+    path('trainer/athlete/<int:athlete_id>/progress_graph/', simple_views.trainer_athlete_progress_graph, name='trainer_athlete_progress_graph'),
+    path('trainer/athlete/<int:athlete_id>/plans/', simple_views.trainer_athlete_plans, name='trainer_athlete_plans'),
 ]

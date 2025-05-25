@@ -54,3 +54,12 @@ class ProgressEntry(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.exercise} ({self.date})"
+
+class PlanFeedback(models.Model):
+    plan = models.ForeignKey(TrainingPlan, on_delete=models.CASCADE, related_name='feedbacks')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Feedback de {self.user.username} para {self.plan.name}"
