@@ -1,15 +1,62 @@
 {% extends 'users/base.html' %}
+{% block title %}Planes asignados a {{ athlete.username }}{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+.trainer-section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #007bff;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+.trainer-plan-list {
+    max-width: 700px;
+    margin: 0 auto 2rem auto;
+    padding: 0;
+    list-style: none;
+}
+.trainer-plan-list li {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    margin-bottom: 1.1rem;
+    padding: 1.2rem 1.5rem;
+    font-size: 1.13rem;
+    font-weight: 500;
+}
+.trainer-plan-list .plan-label {
+    color: #007bff;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+.trainer-plan-list .plan-user {
+    color: #34495e;
+    font-size: 1rem;
+    margin-left: 0.7rem;
+}
+.trainer-plan-list .bi {
+    font-size: 1.3rem;
+    margin-right: 0.7rem;
+    color: #00c6ff;
+}
+.btn-back {
+    margin-top: 2rem;
+}
+</style>
+{% endblock %}
 {% block content %}
-<h1>Planes asignados a {{ athlete.username }}</h1>
-<ul>
+<div class="trainer-section-title"><i class="bi bi-list-task"></i> Planes asignados a {{ athlete.username }}</div>
+<ul class="trainer-plan-list">
     {% for plan in plans %}
         <li>
-            <strong>{{ plan.name }}</strong> ({{ plan.created_at|date:'Y-m-d' }}) - Objetivo: {{ plan.goals }}
+            <span><i class="bi bi-list-task"></i> <span class="plan-label">{{ plan.name }}</span> <span class="plan-user">({{ plan.created_at|date:'Y-m-d' }}) - Objetivo: {{ plan.goals }}</span></span>
             <form method="post" action="{% url 'users:trainer_training_plan_delete' plan.id %}" style="display:inline;">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que deseas eliminar este plan?');">Eliminar</button>
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que deseas eliminar este plan?');"><i class="bi bi-trash"></i> Eliminar</button>
             </form>
-            <ul>
+            <ul class="mt-2">
                 {% if feedbacks and plan.id in feedbacks %}
                     {% for fb in feedbacks.plan.id %}
                         <li><em>{{ fb.user.username }}</em> ({{ fb.created_at|date:'Y-m-d H:i' }}): {{ fb.comment }}</li>
@@ -25,5 +72,5 @@
         <li>No hay planes asignados.</li>
     {% endfor %}
 </ul>
-<a href="{% url 'users:trainer_athlete_progress_detail' athlete.id %}">Volver</a>
+<a class="btn btn-secondary btn-back" href="{% url 'users:trainer_athlete_progress_detail' athlete.id %}"><i class="bi bi-arrow-left"></i> Volver</a>
 {% endblock %}

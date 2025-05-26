@@ -1,15 +1,72 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Registro</title>
-</head>
-<body>
-    <h1>Registro</h1>
-    <form method="post">
+{% extends 'users/base.html' %}
+{% block title %}Registro{% endblock %}
+{% block extra_head %}
+<style>
+.register-container {
+    max-width: 440px;
+    margin: 60px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1.5px 4px rgba(0,0,0,0.08);
+    padding: 2.5rem 2rem 2rem 2rem;
+    text-align: center;
+}
+.register-title {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+    letter-spacing: 1px;
+}
+.form-label {
+    font-weight: 500;
+    color: #34495e;
+}
+.form-control {
+    border-radius: 8px;
+    margin-bottom: 1.2rem;
+    font-size: 1.1rem;
+}
+.btn-register {
+    background: linear-gradient(90deg, #00c6ff 0%, #007bff 100%);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 2.5rem;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+}
+.btn-register:hover {
+    background: linear-gradient(90deg, #00aaff 0%, #0056b3 100%);
+}
+.register-link {
+    margin-top: 1.5rem;
+    display: block;
+    color: #007bff;
+    text-decoration: none;
+}
+.register-link:hover {
+    text-decoration: underline;
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="register-container">
+    <div class="register-title">Crea tu cuenta</div>
+    <form method="post" autocomplete="off">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Registrar</button>
+        {% for field in form %}
+            <div class="mb-3 text-start">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <div class="text-danger small">{{ field.errors|striptags }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-register w-100">Registrar</button>
     </form>
-    <p>¿Ya tienes cuenta? <a href="{% url 'users:login' %}">Inicia sesión aquí</a></p>
-</body>
-</html>
+    <a class="register-link" href="{% url 'users:login' %}">¿Ya tienes cuenta? Inicia sesión aquí</a>
+</div>
+{% endblock %}

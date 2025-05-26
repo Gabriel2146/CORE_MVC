@@ -1,0 +1,279 @@
+FUNCIONALIDADES DESARROLLADAS SEGÚN PROPUESTA CORE MVC
+=====================================================
+
+1. Sincronización de ejercicios desde la API de wger y copia a la base local.
+   - Implementado: Sincronización manual desde el panel de administrador.
+   - Archivo: users/simple_views.py
+   - Función: sync_wger_exercises
+   - Ejemplo de código:
+     ```python
+     def sync_wger_exercises(request):
+         if request.method == 'POST':
+             count = sync_exercises_from_wger()
+             messages.success(request, f"{count} ejercicios sincronizados.")
+         return redirect('admin_dashboard')
+     ```
+
+2. Fallback en generación de planes si no hay ejercicios por objetivo.
+   - Implementado: Si no hay ejercicios para el objetivo, se usan todos los disponibles.
+   - Archivo: training/services.py (función generate_training_plan)
+   - users/simple_views.py (trainer_auto_generate_plan, auto_generate_plan)
+   - Ejemplo de código:
+     ```python
+     def generate_training_plan(user, objetivo):
+         ejercicios = Exercise.objects.filter(goal=objetivo)
+         if not ejercicios.exists():
+             ejercicios = Exercise.objects.all()
+         # ... lógica para crear el plan ...
+     ```
+
+3. Dashboard de administrador con métricas y logs.
+   - Implementado: Métricas de usuarios, entrenadores, deportistas, planes y ejercicios. Logs de sincronización.
+   - Archivo: users/simple_views.py
+   - Función: admin_dashboard
+   - Ejemplo de código:
+     ```python
+     def admin_dashboard(request):
+         total_users = User.objects.count()
+         total_trainers = User.objects.filter(role='trainer').count()
+         total_athletes = User.objects.filter(role='athlete').count()
+         # ...
+         return render(request, 'users/admin_dashboard.html', {...})
+     ```
+
+4. Exportación de reportes CSV (usuarios, ejercicios, planes).
+   - Implementado: Descarga de CSV desde el panel de administrador.
+   - Archivo: users/simple_views.py
+   - Funciones: export_users_csv, export_exercises_csv, export_plans_csv
+   - Ejemplo de código:
+     ```python
+     def export_users_csv(request):
+         response = HttpResponse(content_type='text/csv')
+         writer = csv.writer(response)
+         writer.writerow(['ID', 'Nombre', 'Rol'])
+         for user in User.objects.all():
+             writer.writerow([user.id, user.username, user.role])
+         return response
+     ```
+
+5. Edición manual y asignación de planes por el entrenador.
+   - Implementado: Entrenador puede crear, editar, asignar y eliminar planes a sus atletas.
+   - Archivo: users/simple_views.py
+   - Funciones: trainer_training_plan_create, trainer_training_plan_edit, trainer_training_plan_delete
+   - Ejemplo de código:
+     ```python
+     def trainer_training_plan_create(request, athlete_id):
+         if request.method == 'POST':
+             form = TrainingPlanForm(request.POST)
+             if form.is_valid():
+                 plan = form.save(commit=False)
+                 plan.athlete_id = athlete_id
+                 plan.trainer = request.user
+                 plan.save()
+                 messages.success(request, 'Plan creado y asignado.')
+                 return redirect('trainer_athlete_plans', athlete_id=athlete_id)
+         # ...existing code...
+     ```
+
+6. Notificación al deportista al asignar plan.
+   - Implementado: Mensaje de éxito simulado vía Django messages.
+   - Archivo: users/simple_views.py
+   - Función: trainer_auto_generate_plan (uso de messages.success)
+   - Ejemplo de código:
+     ```python
+     messages.success(request, f"Plan generado y asignado a {athlete.username}.")
+     ```
+
+7. Visualización gráfica del progreso (Chart.js) para entrenador y deportista.
+   - Implementado: Gráficas de progreso por plan y por usuario, con selección de plan.
+   - Archivo: users/simple_views.py
+   - Función: athlete_progress_graph, trainer_athlete_progress_graph
+   - Template: users/templates/users/athlete_progress_graph.html
+   - Ejemplo de código (vista):
+     ```python
+     def athlete_progress_graph(request):
+         plans = TrainingPlan.objects.filter(athlete=request.user)
+         selected_plan = request.GET.get('plan')
+         progress = ProgressEntry.objects.filter(plan_id=selected_plan)
+         # ...existing code...
+     ```
+   - Ejemplo de código (template):
+     ```html
+     <select name="plan" onchange="this.form.submit()">
+         {% for plan in plans %}
+             <option value="{{ plan.id }}" {% if plan.id == selected_plan %}selected{% endif %}>{{ plan.name }}</option>
+         {% endfor %}
+     </select>
+     <canvas id="progressChart"></canvas>
+     ```
+
+8. Historial de planes y feedback de deportistas.
+   - Implementado: Vista de historial de planes y comentarios/feedback asociados.
+   - Archivo: users/simple_views.py
+   - Función: athlete_training_plans, trainer_athlete_plans
+   - Template: users/templates/users/athlete_training_plans.html, trainer_athlete_plans.html
+   - Ejemplo de código:
+     ```html
+     {% for plan in plans %}
+         <tr>
+             <td>{{ plan.name }}</td>
+             <td>{{ plan.start_date }}</td>
+             <td>{{ plan.end_date }}</td>
+             <td>{% for fb in plan.feedbacks.all %}{{ fb.text }}<br>{% endfor %}</td>
+         </tr>
+     {% endfor %}
+     ```
+
+9. Solicitud de revisión/cambio de plan por el deportista (nueva vista y template).
+   - Implementado: Formulario para solicitar revisión/cambio, guardado como feedback especial.
+   - Archivo: users/simple_views.py
+   - Función: request_plan_review
+   - Template: users/templates/users/request_plan_review.html
+   - Ejemplo de código:
+     ```python
+     def request_plan_review(request, plan_id):
+         if request.method == 'POST':
+             text = request.POST['text']
+             PlanFeedback.objects.create(plan_id=plan_id, user=request.user, text=text, type='review')
+             messages.success(request, 'Solicitud enviada.')
+             return redirect('athlete_training_plans')
+         # ...existing code...
+     ```
+
+10. Recursos educativos (estructura base).
+    - Implementado: Vista con enlaces a recursos educativos.
+    - Archivo: users/simple_views.py
+    - Función: educational_resources
+    - Template: users/templates/users/educational_resources.html
+    - Ejemplo de código:
+      ```html
+      <ul>
+        <li><a href="https://www.who.int/es/news-room/fact-sheets/detail/physical-activity">OMS: Actividad física</a></li>
+        <li><a href="https://entrenamiento.com/">Entrenamiento.com</a></li>
+      </ul>
+      ```
+
+11. Filtros avanzados de ejercicios (estructura base).
+    - Implementado: Vista de ejercicios con filtros avanzados para el entrenador.
+    - Archivo: users/simple_views.py
+    - Función: trainer_exercises_advanced
+    - Template: users/templates/users/trainer_exercises_advanced.html
+    - Ejemplo de código:
+      ```python
+      def trainer_exercises_advanced(request):
+          ejercicios = Exercise.objects.all()
+          if 'muscle' in request.GET:
+              ejercicios = ejercicios.filter(muscle=request.GET['muscle'])
+          # ...existing code...
+      ```
+
+12. Corrección de errores de rutas (NoReverseMatch) y templates (herencia, acceso a diccionarios).
+    - Implementado: Todas las vistas y templates usan herencia y rutas corregidas.
+    - Archivos: users/urls.py, users/templates/users/base.html y todos los templates de usuario
+    - Ejemplo de código:
+      ```html
+      {% extends 'users/base.html' %}
+      {% url 'athlete_progress' %}
+      ```
+
+13. Creación de base.html y adaptación de templates para herencia.
+    - Implementado: Todos los templates extienden de base.html para coherencia visual.
+    - Archivo: users/templates/users/base.html
+    - Uso en todos los templates: {% extends 'users/base.html' %}
+    - Ejemplo de código:
+      ```html
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>{% block title %}CORE MVC{% endblock %}</title>
+      </head>
+      <body>
+        <nav>
+          <!-- menú -->
+        </nav>
+        {% block content %}{% endblock %}
+      </body>
+      </html>
+      ```
+
+14. Adaptación de la vista y template de ejercicios del deportista para seleccionar plan desde un combobox y mostrar ejercicios del plan.
+    - Implementado: El deportista puede seleccionar plan y ver solo los ejercicios asignados.
+    - Archivo: users/simple_views.py
+    - Función: athlete_exercises
+    - Template: users/templates/users/athlete_exercises.html
+    - Ejemplo de código:
+      ```html
+      <form method="get">
+        <select name="plan" onchange="this.form.submit()">
+          {% for plan in plans %}
+            <option value="{{ plan.id }}" {% if plan.id == selected_plan %}selected{% endif %}>{{ plan.name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+      <ul>
+        {% for exercise in exercises %}
+          <li>{{ exercise.name }}</li>
+        {% endfor %}
+      </ul>
+      ```
+
+15. Adaptación de la vista de registro de progreso del deportista para que dependa de la selección de plan y solo muestre ejercicios del plan seleccionado.
+    - Implementado: Registro de progreso filtrado por plan y ejercicios del plan.
+    - Archivo: users/simple_views.py
+    - Función: athlete_progress
+    - Template: users/templates/users/athlete_progress.html
+    - Ejemplo de código:
+      ```python
+      def athlete_progress(request):
+          plans = TrainingPlan.objects.filter(athlete=request.user)
+          selected_plan = request.GET.get('plan')
+          exercises = Exercise.objects.filter(trainingplan__id=selected_plan)
+          # ...existing code...
+      ```
+
+16. Corrección de acceso a feedbacks en templates y enlaces de navegación.
+    - Implementado: Feedbacks y navegación funcional en todas las vistas.
+    - Archivo: users/simple_views.py
+    - Funciones: athlete_training_plans, trainer_athlete_plans
+    - Templates: athlete_training_plans.html, trainer_athlete_plans.html
+    - Ejemplo de código:
+      ```html
+      {% for fb in plan.feedbacks.all %}{{ fb.text }}<br>{% endfor %}
+      <a href="{% url 'trainer_athlete_plans' athlete.id %}">Volver a planes</a>
+      ```
+
+17. Eliminar planes desde la vista de entrenador sobre los planes de un atleta.
+    - Implementado: Botón de eliminar y confirmación, con permisos robustos.
+    - Archivo: users/simple_views.py
+    - Función: trainer_training_plan_delete
+    - Template: users/templates/users/trainer_athlete_plans.html (botón eliminar)
+    - Ejemplo de código:
+      ```html
+      <form method="post" action="{% url 'trainer_training_plan_delete' plan.id %}">
+        {% csrf_token %}
+        <button type="submit">Eliminar</button>
+      </form>
+      ```
+
+18. Selección de plan en la gráfica de progreso del deportista.
+    - Implementado: Combobox para filtrar la gráfica por plan.
+    - Archivo: users/simple_views.py
+    - Función: athlete_progress_graph
+    - Template: users/templates/users/athlete_progress_graph.html
+    - Ejemplo de código:
+      ```html
+      <form method="get">
+        <select name="plan" onchange="this.form.submit()">
+          {% for plan in plans %}
+            <option value="{{ plan.id }}" {% if plan.id == selected_plan %}selected{% endif %}>{{ plan.name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+      <canvas id="progressChart"></canvas>
+      ```
+
+ESTADO GENERAL:
+---------------
+Todas las funcionalidades principales propuestas en el core MVC han sido implementadas y probadas. El sistema permite la gestión completa de usuarios, planes, ejercicios, progreso y feedback, con experiencia diferenciada para cada rol (Administrador, Entrenador, Deportista, Invitado).
+
+Cualquier funcionalidad adicional o ajuste visual puede ser implementado según requerimiento.

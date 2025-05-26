@@ -1,14 +1,101 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard Administrador</title>
+    {% extends 'users/base.html' %}
+    {% block title %}Dashboard Administrador{% endblock %}
+    {% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+    .admin-dashboard-title {
+        font-weight: 700;
+        font-size: 2.2rem;
+        color: #007bff;
+        margin-bottom: 2.2rem;
+        letter-spacing: 1px;
+        text-align: center;
+    }
+    .admin-admin-card {
+        background: linear-gradient(90deg, #007bff 0%, #00c6ff 100%);
+        color: #fff;
+        border-radius: 18px;
+        padding: 2.2rem 1.2rem 1.5rem 1.2rem;
+        margin-bottom: 1.2rem;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+        text-align: center;
+        font-size: 1.25rem;
+        font-weight: 600;
+        transition: transform 0.15s, box-shadow 0.15s;
+        position: relative;
+    }
+    .admin-admin-card i {
+        font-size: 2.2rem;
+        margin-bottom: 0.5rem;
+        display: block;
+        opacity: 0.85;
+    }
+    .admin-admin-card:hover {
+        transform: translateY(-4px) scale(1.04);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        z-index: 2;
+    }
+    .admin-admin-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 auto;
+        max-width: 600px;
+    }
+    .admin-admin-list li {
+        margin-bottom: 1.2rem;
+    }
+    .admin-admin-link {
+        display: block;
+        padding: 1.2rem 1rem;
+        border-radius: 14px;
+        background: #fff;
+        color: #007bff;
+        font-weight: 600;
+        font-size: 1.15rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        text-decoration: none;
+        transition: background 0.15s, color 0.15s;
+    }
+    .admin-admin-link:hover {
+        background: #eaf6ff;
+        color: #0056b3;
+        text-decoration: none;
+    }
+    .logout-link {
+        display: inline-block;
+        margin-top: 2rem;
+        color: #dc3545;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 1.1rem;
+    }
+    .logout-link:hover {
+        color: #a71d2a;
+        text-decoration: underline;
+    }
+    </style>
+    {% endblock %}
 </head>
 <body>
-    <h1>Bienvenido, {{ user.username }} (Administrador)</h1>
-    <ul>
-        <li><a href="{% url 'users:admin_exercises' %}">Gestionar Ejercicios</a></li>
-        <li><a href="{% url 'users:admin_training_plans' %}">Gestionar Planes de Entrenamiento</a></li>
-        <li><a href="{% url 'users:logout' %}">Cerrar sesión</a></li>
+    {% block content %}
+    <div class="admin-dashboard-title mb-4">
+        <i class="bi bi-person-gear"></i> Bienvenido, {{ user.username }} (Administrador)
+    </div>
+    <ul class="admin-admin-list">
+        <li>
+            <a class="admin-admin-link" href="{% url 'users:admin_exercises' %}"><i class="bi bi-bar-chart"></i> Gestionar Ejercicios</a>
+        </li>
+        <li>
+            <a class="admin-admin-link" href="{% url 'users:admin_training_plans' %}"><i class="bi bi-list-task"></i> Gestionar Planes de Entrenamiento</a>
+        </li>
+        <li>
+            <a class="admin-admin-link" href="{% url 'users:admin_users' %}"><i class="bi bi-people"></i> Gestionar Usuarios</a>
+        </li>
     </ul>
+    <a class="logout-link" href="{% url 'users:logout' %}"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+    {% endblock %}
 </body>
 </html>

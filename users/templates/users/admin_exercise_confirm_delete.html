@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Eliminar Ejercicio</title>
+    <title>{% block title %}Eliminar Ejercicio{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 </head>
 <body>
-    <h1>Eliminar Ejercicio</h1>
-    <p>¿Estás seguro de que deseas eliminar el ejercicio "{{ exercise.name }}"?
-        {% if type == 'wger' %}<br><em>(Este ejercicio es importado de wger)</em>{% endif %}
-        {% if type == 'local' %}<br><em>(Este ejercicio es local)</em>{% endif %}
-    </p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Confirmar eliminación</button>
-    </form>
-    <a href="{% url 'users:admin_exercises' %}">Cancelar</a>
+    {% block content %}
+    <div class="container">
+        <h1 class="mb-4">Eliminar Ejercicio</h1>
+        <p>¿Estás seguro de que deseas eliminar el ejercicio <strong>{{ exercise.name }}</strong>?
+            {% if type == 'wger' %}<br><em>(Este ejercicio es importado de wger)</em>{% endif %}
+            {% if type == 'local' %}<br><em>(Este ejercicio es local)</em>{% endif %}
+        </p>
+        <form method="post" class="mb-3">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Confirmar eliminación</button>
+            <a class="btn btn-secondary ms-2" href="{% url 'users:admin_exercises' %}">Cancelar</a>
+        </form>
+    </div>
+    {% endblock %}
 </body>
 </html>

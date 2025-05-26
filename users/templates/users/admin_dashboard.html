@@ -1,41 +1,117 @@
-{% extends 'base.html' %}
+{% extends 'users/base.html' %}
+{% block title %}Panel de Administrador{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+.admin-dashboard-title {
+    font-weight: 700;
+    font-size: 2.3rem;
+    color: #007bff;
+    margin-bottom: 2.2rem;
+    letter-spacing: 1px;
+    text-align: center;
+}
+.admin-metric-card {
+    background: linear-gradient(90deg, #007bff 0%, #00c6ff 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 2.2rem 1.2rem 1.5rem 1.2rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+    text-align: center;
+    font-size: 1.35rem;
+    font-weight: 600;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+}
+.admin-metric-card i {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    opacity: 0.85;
+}
+.admin-metric-card:hover {
+    transform: translateY(-4px) scale(1.04);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    z-index: 2;
+}
+.admin-section-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #007bff;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+}
+.admin-table th {
+    background: #f5f8fa;
+    font-weight: 600;
+}
+.admin-table td, .admin-table th {
+    vertical-align: middle;
+}
+.admin-export-list li {
+    margin-bottom: 0.7rem;
+}
+.admin-export-list .btn {
+    min-width: 220px;
+    font-weight: 500;
+    font-size: 1.08rem;
+}
+@media (max-width: 768px) {
+    .admin-metric-card { font-size: 1.08rem; padding: 1.2rem 0.5rem; }
+}
+</style>
+{% endblock %}
 {% block content %}
-<h1>Panel de Administrador</h1>
-<div class="dashboard-metrics">
-    <h2>Métricas Generales</h2>
-    <ul>
-        <li>Usuarios: {{ total_users }}</li>
-        <li>Entrenadores: {{ total_trainers }}</li>
-        <li>Deportistas: {{ total_athletes }}</li>
-        <li>Planes de entrenamiento: {{ total_plans }}</li>
-        <li>Ejercicios: {{ total_exercises }}</li>
-    </ul>
+<div class="admin-dashboard-title mb-4">
+    <i class="bi bi-speedometer2"></i> Panel de Administrador
 </div>
-<div class="dashboard-logs">
-    <h2>Historial de sincronización de ejercicios</h2>
-    <table class="table">
-        <thead>
-            <tr><th>Fecha</th><th>Acción</th><th>Detalle</th></tr>
-        </thead>
-        <tbody>
-        {% for log in sync_logs %}
-            <tr>
-                <td>{{ log.timestamp|date:'Y-m-d H:i' }}</td>
-                <td>{{ log.action }}</td>
-                <td>{{ log.detail }}</td>
-            </tr>
-        {% empty %}
-            <tr><td colspan="3">Sin registros de sincronización.</td></tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<div class="row mb-4 g-3 justify-content-center">
+    <div class="col-6 col-md-2 admin-metric-card">
+        <i class="bi bi-people"></i>
+        Usuarios<br><span style="font-size:2.1rem;">{{ total_users }}</span>
+    </div>
+    <div class="col-6 col-md-2 admin-metric-card">
+        <i class="bi bi-person-badge"></i>
+        Entrenadores<br><span style="font-size:2.1rem;">{{ total_trainers }}</span>
+    </div>
+    <div class="col-6 col-md-2 admin-metric-card">
+        <i class="bi bi-person-running"></i>
+        Deportistas<br><span style="font-size:2.1rem;">{{ total_athletes }}</span>
+    </div>
+    <div class="col-6 col-md-3 admin-metric-card">
+        <i class="bi bi-list-task"></i>
+        Planes de entrenamiento<br><span style="font-size:2.1rem;">{{ total_plans }}</span>
+    </div>
+    <div class="col-6 col-md-3 admin-metric-card">
+        <i class="bi bi-bar-chart"></i>
+        Ejercicios<br><span style="font-size:2.1rem;">{{ total_exercises }}</span>
+    </div>
 </div>
-<div class="dashboard-exports">
-    <h2>Exportar reportes</h2>
-    <ul>
-        <li><a href="{% url 'export_users_csv' %}">Exportar usuarios (CSV)</a></li>
-        <li><a href="{% url 'export_exercises_csv' %}">Exportar ejercicios (CSV)</a></li>
-        <li><a href="{% url 'export_plans_csv' %}">Exportar planes (CSV)</a></li>
-    </ul>
+<div class="admin-section-title"><i class="bi bi-clock-history"></i> Historial de sincronización de ejercicios</div>
+<div class="table-responsive">
+<table class="table table-striped admin-table align-middle">
+    <thead>
+        <tr><th>Fecha</th><th>Acción</th><th>Detalle</th></tr>
+    </thead>
+    <tbody>
+    {% for log in sync_logs %}
+        <tr>
+            <td>{{ log.timestamp|date:'Y-m-d H:i' }}</td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.detail }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="3">Sin registros de sincronización.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
 </div>
+<div class="admin-section-title"><i class="bi bi-download"></i> Exportar reportes</div>
+<ul class="admin-export-list list-unstyled">
+    <li><a class="btn btn-outline-primary mb-2" href="{% url 'export_users_csv' %}"><i class="bi bi-people"></i> Exportar usuarios (CSV)</a></li>
+    <li><a class="btn btn-outline-primary mb-2" href="{% url 'export_exercises_csv' %}"><i class="bi bi-bar-chart"></i> Exportar ejercicios (CSV)</a></li>
+    <li><a class="btn btn-outline-primary mb-2" href="{% url 'export_plans_csv' %}"><i class="bi bi-list-task"></i> Exportar planes (CSV)</a></li>
+</ul>
 {% endblock %}

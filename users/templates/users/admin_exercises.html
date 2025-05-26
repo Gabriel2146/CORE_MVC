@@ -1,47 +1,55 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Gestión de Ejercicios - Administrador</title>
-</head>
-<body>
-    <h1>Gestión de Ejercicios</h1>
-    <p><a href="{% url 'users:dashboard' %}">Volver al Dashboard</a></p>
-    <p><a href="{% url 'users:admin_exercise_create' %}">Crear Nuevo Ejercicio</a></p>
-    <p><a href="{% url 'users:sync_wger_exercises' %}">Sincronizar Ejercicios desde wger</a></p>
-    <table border="1" cellpadding="5" cellspacing="0">
-        <thead>
-            <tr>
-                <th>ID wger</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Categoría</th>
-                <th>Equipamiento</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for exercise in exercises %}
-            <tr>
-                <td>{{ exercise.obj.wger_id }}</td>
-                <td>{{ exercise.obj.name }}</td>
-                <td>{{ exercise.obj.description|safe }}</td>
-                <td>{{ exercise.obj.category }}</td>
-                <td>{{ exercise.obj.equipment }}</td>
-                <td>
-                    {% if exercise.type == 'local' %}
-                        <a href="{% url 'users:admin_exercise_edit' exercise.obj.pk %}?type=local">Editar</a> |
-                        <a href="{% url 'users:admin_exercise_delete' exercise.obj.pk %}?type=local">Eliminar</a>
-                    {% else %}
-                        <!-- Optionally allow editing wger exercises, but usually only delete is allowed -->
-                        <span style="color:gray;">Editar</span> |
-                        <a href="{% url 'users:admin_exercise_delete' exercise.obj.pk %}?type=wger">Eliminar</a>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="6">No hay ejercicios disponibles.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+{% extends 'users/base.html' %}
+{% block title %}Gestión de Ejercicios{% endblock %}
+{% block extra_head %}
+<style>
+.admin-table th {
+    background: #f5f8fa;
+    font-weight: 600;
+}
+.admin-table td, .admin-table th {
+    vertical-align: middle;
+}
+</style>
+{% endblock %}
+{% block content %}
+<h1 class="mb-4">Gestión de Ejercicios</h1>
+<div class="mb-3">
+    <a class="btn btn-secondary me-2" href="{% url 'users:dashboard' %}">Volver al Dashboard</a>
+    <a class="btn btn-primary me-2" href="{% url 'users:admin_exercise_create' %}">Crear Nuevo Ejercicio</a>
+    <a class="btn btn-info text-white" href="{% url 'users:sync_wger_exercises' %}">Sincronizar Ejercicios desde wger</a>
+</div>
+<table class="table table-striped admin-table">
+    <thead>
+        <tr>
+            <th>ID wger</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Categoría</th>
+            <th>Equipamiento</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for exercise in exercises %}
+        <tr>
+            <td>{{ exercise.obj.wger_id }}</td>
+            <td>{{ exercise.obj.name }}</td>
+            <td>{{ exercise.obj.description|safe }}</td>
+            <td>{{ exercise.obj.category }}</td>
+            <td>{{ exercise.obj.equipment }}</td>
+            <td>
+                {% if exercise.type == 'local' %}
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'users:admin_exercise_edit' exercise.obj.pk %}?type=local">Editar</a>
+                    <a class="btn btn-sm btn-outline-danger ms-1" href="{% url 'users:admin_exercise_delete' exercise.obj.pk %}?type=local">Eliminar</a>
+                {% else %}
+                    <span class="text-muted">Editar</span>
+                    <a class="btn btn-sm btn-outline-danger ms-1" href="{% url 'users:admin_exercise_delete' exercise.obj.pk %}?type=wger">Eliminar</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No hay ejercicios disponibles.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

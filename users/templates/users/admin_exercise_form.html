@@ -4,17 +4,29 @@
     <title>{% if form.instance.pk %}Editar Ejercicio{% else %}Crear Ejercicio{% endif %}</title>
 </head>
 <body>
-    <h1>{% if form.instance.pk %}Editar Ejercicio{% else %}Crear Ejercicio{% endif %}</h1>
+    {% extends 'users/base.html' %}
+    {% block title %}{% if form.instance.pk %}Editar Ejercicio{% else %}Crear Ejercicio{% endif %}{% endblock %}
+    {% block content %}
+    <h1 class="mb-4">{% if form.instance.pk %}Editar Ejercicio{% else %}Crear Ejercicio{% endif %}</h1>
     {% if readonly %}
         <p><em>Este ejercicio importado de wger no puede ser editado. Solo es visible en modo lectura.</em></p>
     {% endif %}
-    <form method="post">
+    <form method="post" class="mb-3" autocomplete="off">
         {% csrf_token %}
-        {{ form.as_p }}
+        {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <div class="text-danger small">{{ field.errors|striptags }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
         {% if not readonly %}
-            <button type="submit">Guardar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
         {% endif %}
+        <a class="btn btn-secondary ms-2" href="{% url 'users:admin_exercises' %}">Volver a la lista de ejercicios</a>
     </form>
-    <a href="{% url 'users:admin_exercises' %}">Volver a la lista de ejercicios</a>
+    {% endblock %}
 </body>
 </html>

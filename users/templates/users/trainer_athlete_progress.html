@@ -2,12 +2,34 @@
 <html>
 <head>
     <title>Progreso de Deportistas</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .trainer-section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+        .trainer-select {
+            max-width: 350px;
+            margin: 0 auto 2rem auto;
+        }
+        .trainer-progress-table th {
+            background: #f5f8fa;
+            font-weight: 600;
+        }
+        .trainer-progress-table td, .trainer-progress-table th {
+            vertical-align: middle;
+        }
+    </style>
 </head>
 <body>
-    <h1>Progreso de Deportistas</h1>
-    <form method="get" action="">
-        <label for="athlete">Selecciona un deportista:</label>
-        <select name="athlete_id" id="athlete" onchange="if(this.value) window.location.href='{% url 'users:trainer_athlete_progress_detail' 0 %}'.replace('0', this.value);">
+    <div class="trainer-section-title"><i class="bi bi-graph-up-arrow"></i> Progreso de Deportistas</div>
+    <form method="get" class="trainer-select mb-4">
+        <label for="athlete" class="form-label">Selecciona un deportista:</label>
+        <select name="athlete_id" id="athlete" class="form-select" onchange="if(this.value) window.location.href='{% url 'users:trainer_athlete_progress_detail' 0 %}'.replace('0', this.value);">
             <option value="">-- Selecciona --</option>
             {% for athlete in athletes %}
                 <option value="{{ athlete.id }}" {% if selected_athlete and selected_athlete.id == athlete.id %}selected{% endif %}>{{ athlete.username }}</option>
@@ -15,10 +37,11 @@
         </select>
     </form>
     {% if selected_athlete %}
-        <h2>Progreso de {{ selected_athlete.username }}</h2>
-        <a href="{% url 'users:trainer_athlete_progress_graph' selected_athlete.id %}">Ver gráfico de progreso</a> |
-        <a href="{% url 'users:trainer_athlete_plans' selected_athlete.id %}">Ver historial de planes</a>
-        <table border="1" cellpadding="5" cellspacing="0">
+        <h2 class="mb-3">Progreso de {{ selected_athlete.username }}</h2>
+        <a class="btn btn-outline-info mb-2" href="{% url 'users:trainer_athlete_progress_graph' selected_athlete.id %}"><i class="bi bi-graph-up"></i> Ver gráfico de progreso</a>
+        <a class="btn btn-outline-primary mb-2" href="{% url 'users:trainer_athlete_plans' selected_athlete.id %}"><i class="bi bi-list-task"></i> Ver historial de planes</a>
+        <div class="table-responsive">
+        <table class="table table-striped trainer-progress-table">
             <thead>
                 <tr>
                     <th>Ejercicio</th>
@@ -44,7 +67,8 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
     {% endif %}
-    <a href="{% url 'users:dashboard' %}">Volver al Dashboard</a>
+    <a class="btn btn-secondary mt-3" href="{% url 'users:dashboard' %}"><i class="bi bi-arrow-left"></i> Volver al Dashboard</a>
 </body>
 </html>
