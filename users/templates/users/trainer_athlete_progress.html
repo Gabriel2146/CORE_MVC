@@ -16,8 +16,8 @@
     </form>
     {% if selected_athlete %}
         <h2>Progreso de {{ selected_athlete.username }}</h2>
-        <a href="{% url 'trainer_athlete_progress_graph' selected_athlete.id %}">Ver gráfico de progreso</a> |
-        <a href="{% url 'trainer_athlete_plans' selected_athlete.id %}">Ver historial de planes</a>
+        <a href="{% url 'users:trainer_athlete_progress_graph' selected_athlete.id %}">Ver gráfico de progreso</a> |
+        <a href="{% url 'users:trainer_athlete_plans' selected_athlete.id %}">Ver historial de planes</a>
         <table border="1" cellpadding="5" cellspacing="0">
             <thead>
                 <tr>

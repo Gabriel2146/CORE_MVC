@@ -4,6 +4,8 @@
     <title>Planes de Entrenamiento - Deportista</title>
 </head>
 <body>
+{% extends 'users/base.html' %}
+{% block content %}
     <h1>Planes de Entrenamiento</h1>
     <ul>
         {% for plan in plans %}
@@ -16,11 +18,15 @@
                     <button type="submit">Enviar feedback</button>
                 </form>
                 <ul>
-                    {% for fb in feedbacks|get_item:plan.id %}
-                        <li><em>{{ fb.user.username }}</em> ({{ fb.created_at|date:'Y-m-d H:i' }}): {{ fb.comment }}</li>
-                    {% empty %}
+                    {% if feedbacks and plan.id in feedbacks %}
+                        {% for fb in feedbacks.plan.id %}
+                            <li><em>{{ fb.user.username }}</em> ({{ fb.created_at|date:'Y-m-d H:i' }}): {{ fb.comment }}</li>
+                        {% empty %}
+                            <li>No hay comentarios.</li>
+                        {% endfor %}
+                    {% else %}
                         <li>No hay comentarios.</li>
-                    {% endfor %}
+                    {% endif %}
                 </ul>
             </li>
         {% empty %}
@@ -28,5 +34,6 @@
         {% endfor %}
     </ul>
     <a href="{% url 'users:dashboard' %}">Volver al Dashboard</a>
+{% endblock %}
 </body>
 </html>

@@ -1,21 +1,29 @@
-{% extends 'base.html' %}
+{% extends 'users/base.html' %}
 {% block content %}
 <h1>Planes asignados a {{ athlete.username }}</h1>
 <ul>
     {% for plan in plans %}
         <li>
             <strong>{{ plan.name }}</strong> ({{ plan.created_at|date:'Y-m-d' }}) - Objetivo: {{ plan.goals }}
+            <form method="post" action="{% url 'users:trainer_training_plan_delete' plan.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que deseas eliminar este plan?');">Eliminar</button>
+            </form>
             <ul>
-                {% for fb in plan.feedbacks.all %}
-                    <li><em>{{ fb.user.username }}</em> ({{ fb.created_at|date:'Y-m-d H:i' }}): {{ fb.comment }}</li>
-                {% empty %}
+                {% if feedbacks and plan.id in feedbacks %}
+                    {% for fb in feedbacks.plan.id %}
+                        <li><em>{{ fb.user.username }}</em> ({{ fb.created_at|date:'Y-m-d H:i' }}): {{ fb.comment }}</li>
+                    {% empty %}
+                        <li>No hay comentarios.</li>
+                    {% endfor %}
+                {% else %}
                     <li>No hay comentarios.</li>
-                {% endfor %}
+                {% endif %}
             </ul>
         </li>
     {% empty %}
         <li>No hay planes asignados.</li>
     {% endfor %}
 </ul>
-<a href="{% url 'trainer_athlete_progress' athlete.id %}">Volver</a>
+<a href="{% url 'users:trainer_athlete_progress_detail' athlete.id %}">Volver</a>
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'users/base.html' %}
 {% block content %}
 <h1>Progreso de {{ athlete.username }}</h1>
 <canvas id="progressChart" width="600" height="300"></canvas>
@@ -28,5 +28,5 @@
         }
     });
 </script>
-<a href="{% url 'trainer_athlete_progress' %}">Volver</a>
+<a href="{% url 'users:trainer_athlete_progress' %}">Volver</a>
 {% endblock %}

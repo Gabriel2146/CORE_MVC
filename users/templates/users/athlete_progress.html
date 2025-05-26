@@ -1,52 +1,71 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Progreso Personal - Deportista</title>
-</head>
-<body>
-    <h1>Mi Progreso</h1>
-    <form method="post">
-        {% csrf_token %}
-        <label for="exercise">Ejercicio:</label>
-        <select name="exercise" id="exercise" required>
-            <option value="">-- Selecciona ejercicio --</option>
-            {% for ex in ejercicios %}
-                <option value="{{ ex.id }}">{{ ex.name }}</option>
-            {% endfor %}
-        </select><br>
-        {{ form.sets.label_tag }} {{ form.sets }}<br>
-        {{ form.reps.label_tag }} {{ form.reps }}<br>
-        {{ form.weight.label_tag }} {{ form.weight }}<br>
-        {{ form.notes.label_tag }} {{ form.notes }}<br>
-        <button type="submit">Registrar Progreso</button>
-    </form>
-    <h2>Historial de Progreso</h2>
-    <table border="1" cellpadding="5" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Ejercicio</th>
-                <th>Series</th>
-                <th>Repeticiones</th>
-                <th>Peso</th>
-                <th>Notas</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for entry in progress_entries %}
-            <tr>
-                <td>{{ entry.date }}</td>
-                <td>{{ entry.exercise }}</td>
-                <td>{{ entry.sets }}</td>
-                <td>{{ entry.reps }}</td>
-                <td>{{ entry.weight }}</td>
-                <td>{{ entry.notes }}</td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="6">No hay registros de progreso.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <a href="{% url 'users:dashboard' %}">Volver al Dashboard</a>
-</body>
-</html>
+{% extends 'users/base.html' %}
+{% block title %}Progreso Personal - Deportista{% endblock %}
+{% block content %}
+<h1>Mi Progreso</h1>
+<form method="get" class="mb-3">
+    <label for="plan_id">Selecciona un plan:</label>
+    <select name="plan_id" id="plan_id" class="form-select d-inline w-auto" onchange="this.form.submit()" required>
+        <option value="">-- Selecciona plan --</option>
+        {% for plan in plans %}
+            <option value="{{ plan.id }}" {% if plan == selected_plan %}selected{% endif %}>{{ plan.name }}</option>
+        {% endfor %}
+    </select>
+</form>
+{% if selected_plan %}
+<form method="post" class="mb-4">
+    {% csrf_token %}
+    <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label for="exercise">Ejercicio:</label>
+            <select name="exercise" id="exercise" class="form-select" required>
+                <option value="">-- Selecciona ejercicio --</option>
+                {% for ex in ejercicios %}
+                    <option value="{{ ex.id }}">{{ ex.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">{{ form.sets.label_tag }} {{ form.sets }}</div>
+        <div class="col-md-2">{{ form.reps.label_tag }} {{ form.reps }}</div>
+        <div class="col-md-2">{{ form.weight.label_tag }} {{ form.weight }}</div>
+        <div class="col-md-3">{{ form.notes.label_tag }} {{ form.notes }}</div>
+        <div class="col-md-12 mt-2">
+            <button type="submit" class="btn btn-primary">Registrar Progreso</button>
+        </div>
+    </div>
+    <input type="hidden" name="plan_id" value="{{ selected_plan.id }}">
+</form>
+<h2>Historial de Progreso</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Ejercicio</th>
+            <th>Series</th>
+            <th>Repeticiones</th>
+            <th>Peso</th>
+            <th>Notas</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in progress_entries %}
+        <tr>
+            <td>{{ entry.date }}</td>
+            <td>{{ entry.exercise }}</td>
+            <td>{{ entry.sets }}</td>
+            <td>{{ entry.reps }}</td>
+            <td>{{ entry.weight }}</td>
+            <td>{{ entry.notes }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No hay registros de progreso para este plan.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="alert alert-info">Selecciona un plan para registrar y ver tu progreso.</div>
+{% endif %}
+<div class="mt-3">
+    <a href="{% url 'users:athlete_exercises' %}" class="btn btn-secondary">Ver Ejercicios</a>
+    <a href="{% url 'users:dashboard' %}" class="btn btn-outline-primary">Volver al Dashboard</a>
+</div>
+{% endblock %}

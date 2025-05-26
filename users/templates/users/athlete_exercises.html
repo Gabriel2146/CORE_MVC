@@ -4,36 +4,51 @@
     <title>Mis Ejercicios - Deportista</title>
 </head>
 <body>
+    {% extends 'users/base.html' %}
+    {% block content %}
     <h1>Mis Ejercicios</h1>
     <form method="get">
-        <input type="text" name="q" placeholder="Buscar por nombre" value="{{ query }}">
-        <input type="text" name="category" placeholder="Categoría" value="{{ category }}">
-        <button type="submit">Filtrar</button>
-    </form>
-    <table border="1" cellpadding="5" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Tipo</th>
-                <th>ID wger</th>
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for exercise in exercises %}
-            <tr>
-                <td>{{ exercise.type|title }}</td>
-                <td>{{ exercise.obj.wger_id }}</td>
-                <td>{{ exercise.obj.name }}</td>
-                <td>{{ exercise.obj.category }}</td>
-                <td><a href="{% url 'users:exercise_detail' exercise.type exercise.obj.pk %}">Ver detalle</a></td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="5">No hay ejercicios asignados.</td></tr>
+        <label for="plan_id">Selecciona un plan:</label>
+        <select name="plan_id" id="plan_id" onchange="this.form.submit()">
+            <option value="">-- Selecciona --</option>
+            {% for plan in plans %}
+                <option value="{{ plan.id }}" {% if selected_plan and plan.id == selected_plan.id %}selected{% endif %}>{{ plan.name }} ({{ plan.created_at|date:'Y-m-d' }})</option>
             {% endfor %}
-        </tbody>
-    </table>
-    <a href="{% url 'users:dashboard' %}">Volver al Dashboard</a>
+        </select>
+    </form>
+    {% if selected_plan %}
+        <h2>Ejercicios del plan: {{ selected_plan.name }}</h2>
+        {% if mensaje %}
+            <div class="alert alert-warning">{{ mensaje }}</div>
+        {% endif %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Grupo muscular</th>
+                    <th>Dificultad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exercise in exercises %}
+                <tr>
+                    <td>{{ exercise.name }}</td>
+                    <td>{{ exercise.category }}</td>
+                    <td>{{ exercise.muscle_group }}</td>
+                    <td>{{ exercise.difficulty }}</td>
+                    <td><a href="{% url 'users:exercise_detail' 'local' exercise.pk %}">Ver detalle</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5">No hay ejercicios asignados en este plan.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Selecciona un plan para ver los ejercicios asignados.</p>
+    {% endif %}
+    <a href="{% url 'users:dashboard' %}" class="btn btn-outline-primary mt-3">Volver al Dashboard</a>
+    {% endblock %}
 </body>
 </html>

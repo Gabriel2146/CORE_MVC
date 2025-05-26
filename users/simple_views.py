@@ -310,10 +310,14 @@ def trainer_training_plan_delete(request, pk):
     user = request.user
     if user.role != 'trainer':
         raise PermissionDenied
-    plan = get_object_or_404(TrainingPlan, pk=pk, trainer=user)
+    plan = get_object_or_404(TrainingPlan, pk=pk)
+    # Permitir si el entrenador es el creador del plan o el entrenador asignado al usuario dueño del plan
+    if not (plan.trainer == user or plan.user.training_plans.filter(trainer=user).exists()):
+        raise PermissionDenied
+    athlete_id = plan.user.id
     if request.method == 'POST':
         plan.delete()
-        return redirect('users:trainer_training_plans')
+        return redirect('users:trainer_athlete_plans', athlete_id=athlete_id)
     return render(request, 'users/trainer_training_plan_confirm_delete.html', {'plan': plan})
 
 @login_required
@@ -382,30 +386,28 @@ def athlete_exercises(request):
     user = request.user
     if user.role != 'athlete':
         raise PermissionDenied
-    from training.models import Exercise
-    from wger_integration.models import WgerExercise
-    query = request.GET.get('q', '')
-    category = request.GET.get('category', '')
-    # Solo mostrar ejercicios asignados en sus planes
-    from training.models import TrainingPlan, TrainingSession, ExerciseEntry
+    from training.models import Exercise, TrainingPlan, TrainingSession, ExerciseEntry
     plans = TrainingPlan.objects.filter(user=user)
-    session_ids = TrainingSession.objects.filter(training_plan__in=plans).values_list('id', flat=True)
-    entry_ex_ids = ExerciseEntry.objects.filter(session_id__in=session_ids).values_list('exercise_id', flat=True)
-    local_exercises = Exercise.objects.filter(id__in=entry_ex_ids)
-    wger_ids = local_exercises.values_list('wger_id', flat=True)
-    wger_exercises = WgerExercise.objects.filter(wger_id__in=wger_ids)
-    if query:
-        local_exercises = local_exercises.filter(name__icontains=query)
-        wger_exercises = wger_exercises.filter(name__icontains=query)
-    if category:
-        local_exercises = local_exercises.filter(category__icontains=category)
-        wger_exercises = wger_exercises.filter(category__icontains=category)
-    exercises = [
-        {'type': 'local', 'obj': e} for e in local_exercises
-    ] + [
-        {'type': 'wger', 'obj': e} for e in wger_exercises
-    ]
-    return render(request, 'users/athlete_exercises.html', {'exercises': exercises, 'query': query, 'category': category})
+    selected_plan_id = request.GET.get('plan_id')
+    selected_plan = None
+    exercises = []
+    if selected_plan_id:
+        selected_plan = plans.filter(id=selected_plan_id).first()
+        if selected_plan:
+            # Obtener todas las sesiones del plan
+            session_ids = TrainingSession.objects.filter(training_plan=selected_plan).values_list('id', flat=True)
+            # Obtener todos los ejercicios asociados a las sesiones del plan
+            entry_ex_ids = ExerciseEntry.objects.filter(session_id__in=session_ids).values_list('exercise_id', flat=True)
+            exercises = Exercise.objects.filter(id__in=entry_ex_ids).distinct()
+    mensaje = None
+    if selected_plan and not exercises:
+        mensaje = 'Este plan aún no tiene ejercicios asignados por el entrenador.'
+    return render(request, 'users/athlete_exercises.html', {
+        'plans': plans,
+        'selected_plan': selected_plan,
+        'exercises': exercises,
+        'mensaje': mensaje
+    })
 
 @login_required
 @csrf_exempt
@@ -425,14 +427,21 @@ def athlete_progress(request):
     user = request.user
     if user.role != 'athlete':
         raise PermissionDenied
-    # Obtener ejercicios asignados en los planes del usuario
-    from training.models import TrainingPlan, TrainingSession, ExerciseEntry, Exercise
+    from training.models import TrainingPlan, TrainingSession, ExerciseEntry, Exercise, ProgressEntry
     plans = TrainingPlan.objects.filter(user=user)
-    session_ids = TrainingSession.objects.filter(training_plan__in=plans).values_list('id', flat=True)
-    entry_ex_ids = ExerciseEntry.objects.filter(session_id__in=session_ids).values_list('exercise_id', flat=True)
-    ejercicios = Exercise.objects.filter(id__in=entry_ex_ids).distinct()
+    selected_plan_id = request.GET.get('plan_id') or request.POST.get('plan_id')
+    selected_plan = None
+    ejercicios = Exercise.objects.none()
     progress_entries = ProgressEntry.objects.filter(user=user).order_by('-date')
-    if request.method == 'POST':
+    if selected_plan_id:
+        selected_plan = plans.filter(id=selected_plan_id).first()
+        if selected_plan:
+            session_ids = TrainingSession.objects.filter(training_plan=selected_plan).values_list('id', flat=True)
+            entry_ex_ids = ExerciseEntry.objects.filter(session_id__in=session_ids).values_list('exercise_id', flat=True)
+            ejercicios = Exercise.objects.filter(id__in=entry_ex_ids).distinct()
+            # Filtrar progresos solo de ejercicios de este plan
+            progress_entries = progress_entries.filter(exercise__in=[e.name for e in ejercicios])
+    if request.method == 'POST' and selected_plan:
         ejercicio_id = request.POST.get('exercise')
         if ejercicio_id:
             ejercicio = Exercise.objects.get(id=ejercicio_id)
@@ -442,12 +451,18 @@ def athlete_progress(request):
                 entry.user = user
                 entry.exercise = ejercicio.name
                 entry.save()
-                return redirect('users:athlete_progress')
+                return redirect(f"{request.path}?plan_id={selected_plan.id}")
         else:
             form = ProgressEntryForm(request.POST)
     else:
         form = ProgressEntryForm()
-    return render(request, 'users/athlete_progress.html', {'form': form, 'progress_entries': progress_entries, 'ejercicios': ejercicios})
+    return render(request, 'users/athlete_progress.html', {
+        'plans': plans,
+        'selected_plan': selected_plan,
+        'form': form,
+        'progress_entries': progress_entries,
+        'ejercicios': ejercicios
+    })
 
 @login_required
 def trainer_athlete_progress(request, athlete_id=None):
@@ -523,10 +538,28 @@ def athlete_progress_graph(request):
     user = request.user
     if user.role != 'athlete':
         raise PermissionDenied
+    from training.models import TrainingPlan, TrainingSession, ExerciseEntry, Exercise, ProgressEntry
+    plans = TrainingPlan.objects.filter(user=user)
+    selected_plan_id = request.GET.get('plan_id')
+    selected_plan = None
+    ejercicios = Exercise.objects.none()
     entries = ProgressEntry.objects.filter(user=user).order_by('date')
+    if selected_plan_id:
+        selected_plan = plans.filter(id=selected_plan_id).first()
+        if selected_plan:
+            session_ids = TrainingSession.objects.filter(training_plan=selected_plan).values_list('id', flat=True)
+            entry_ex_ids = ExerciseEntry.objects.filter(session_id__in=session_ids).values_list('exercise_id', flat=True)
+            ejercicios = Exercise.objects.filter(id__in=entry_ex_ids).distinct()
+            entries = entries.filter(exercise__in=[e.name for e in ejercicios])
     fechas = [e.date.strftime('%Y-%m-%d') for e in entries]
-    valores = [e.value for e in entries]
-    return render(request, 'users/athlete_progress_graph.html', {'fechas': fechas, 'valores': valores})
+    valores = [e.weight for e in entries]  # Graficar el peso levantado
+    import json
+    return render(request, 'users/athlete_progress_graph.html', {
+        'plans': plans,
+        'selected_plan': selected_plan,
+        'fechas': json.dumps(fechas),
+        'valores': json.dumps(valores)
+    })
 
 @login_required
 @csrf_exempt
@@ -751,7 +784,78 @@ def trainer_athlete_plans(request, athlete_id):
         raise PermissionDenied
     selected_athlete = get_object_or_404(User, pk=athlete_id, role='athlete')
     plans = TrainingPlan.objects.filter(user=selected_athlete).order_by('-created_at')
+    # Integrar feedbacks en la vista
+    feedbacks = {p.id: PlanFeedback.objects.filter(plan=p).order_by('-created_at') for p in plans}
     return render(request, 'users/trainer_athlete_plans.html', {
         'athlete': selected_athlete,
-        'plans': plans
+        'plans': plans,
+        'feedbacks': feedbacks
+    })
+
+@login_required
+@csrf_exempt
+def request_plan_review(request, plan_id):
+    """
+    Permite al deportista solicitar una revisión o cambio de su plan de entrenamiento.
+    """
+    user = request.user
+    if user.role != 'athlete':
+        raise PermissionDenied
+    plan = get_object_or_404(TrainingPlan, pk=plan_id, user=user)
+    mensaje = None
+    if request.method == 'POST':
+        motivo = request.POST.get('motivo')
+        detalles = request.POST.get('detalles')
+        if motivo:
+            # Guardar la solicitud como feedback especial
+            PlanFeedback.objects.create(plan=plan, user=user, comment=f"[SOLICITUD DE REVISIÓN] {motivo}: {detalles}")
+            mensaje = '¡Solicitud de revisión enviada al entrenador!'
+            messages.success(request, mensaje)
+            return redirect('users:athlete_training_plans')
+        else:
+            mensaje = 'Debes indicar un motivo para la solicitud.'
+    return render(request, 'users/request_plan_review.html', {'plan': plan, 'mensaje': mensaje})
+
+# Recursos educativos (estructura básica, pendiente de contenido real)
+@login_required
+def educational_resources(request):
+    # Acceso abierto a todos los roles
+    recursos = [
+        {'titulo': 'Técnicas de entrenamiento', 'url': 'https://www.example.com/tecnicas'},
+        {'titulo': 'Nutrición deportiva', 'url': 'https://www.example.com/nutricion'},
+        {'titulo': 'Prevención de lesiones', 'url': 'https://www.example.com/lesiones'},
+    ]
+    return render(request, 'users/educational_resources.html', {'recursos': recursos})
+
+# Filtros avanzados de ejercicios (estructura, para extender en templates y lógica)
+@login_required
+@csrf_exempt
+def trainer_exercises_advanced(request):
+    user = request.user
+    if user.role != 'trainer':
+        raise PermissionDenied
+    from training.models import Exercise
+    query = request.GET.get('q', '')
+    category = request.GET.get('category', '')
+    muscle_group = request.GET.get('muscle_group', '')
+    difficulty = request.GET.get('difficulty', '')
+    equipment = request.GET.get('equipment', '')
+    exercises = Exercise.objects.all()
+    if query:
+        exercises = exercises.filter(name__icontains=query)
+    if category:
+        exercises = exercises.filter(category__icontains=category)
+    if muscle_group:
+        exercises = exercises.filter(muscle_group__icontains=muscle_group)
+    if difficulty:
+        exercises = exercises.filter(difficulty__icontains=difficulty)
+    if equipment:
+        exercises = exercises.filter(equipment__icontains=equipment)
+    return render(request, 'users/trainer_exercises_advanced.html', {
+        'exercises': exercises,
+        'query': query,
+        'category': category,
+        'muscle_group': muscle_group,
+        'difficulty': difficulty,
+        'equipment': equipment
     })

@@ -2,20 +2,34 @@
 <html>
 <head>
     <title>Progreso Gráfico</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    {% extends 'users/base.html' %}
+    {% block content %}
     <h1>Progreso de Métricas</h1>
+    <form method="get" class="mb-3">
+        <label for="plan_id">Selecciona un plan:</label>
+        <select name="plan_id" id="plan_id" class="form-select d-inline w-auto" onchange="this.form.submit()" required>
+            <option value="">-- Selecciona plan --</option>
+            {% for plan in plans %}
+                <option value="{{ plan.id }}" {% if plan == selected_plan %}selected{% endif %}>{{ plan.name }}</option>
+            {% endfor %}
+        </select>
+    </form>
     <canvas id="progressChart" width="600" height="300"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const ctx = document.getElementById('progressChart').getContext('2d');
-        const chart = new Chart(ctx, {
+        // Definir variables JS a partir de los datos serializados
+        var fechas = JSON.parse('{{ fechas|escapejs }}');
+        var valores = JSON.parse('{{ valores|escapejs }}');
+        var ctx = document.getElementById('progressChart').getContext('2d');
+        new Chart(ctx, {
             type: 'line',
             data: {
-                labels: {{ fechas|safe }},
+                labels: fechas,
                 datasets: [{
-                    label: 'Progreso',
-                    data: {{ valores|safe }},
+                    label: 'Peso levantado (kg)',
+                    data: valores,
                     borderColor: 'blue',
                     fill: false
                 }]
@@ -23,10 +37,12 @@
             options: {
                 scales: {
                     x: { title: { display: true, text: 'Fecha' } },
-                    y: { title: { display: true, text: 'Valor' } }
+                    y: { title: { display: true, text: 'Peso (kg)' } }
                 }
             }
         });
     </script>
+    <a href="{% url 'users:dashboard' %}" class="btn btn-outline-primary mt-3">Volver</a>
+    {% endblock %}
 </body>
 </html>
