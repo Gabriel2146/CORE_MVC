@@ -3,4 +3,4 @@ djangorestframework
 gunicorn
 psycopg2-binary
 dj-database-url
-rest_framework_simplejwt
+djangorestframework-simplejwt
