@@ -74,4 +74,11 @@ STATIC_URL = '/static/'
 # - Crea una base de datos PostgreSQL en Render y vincúlala.
 # - Configura las variables de entorno: SECRET_KEY, ALLOWED_HOSTS, DEBUG (ponlo en False), etc.
 
+# 8. (Opcional) Ejecutar comandos de administración automáticamente
+# Si no tienes acceso a la terminal de Render, puedes agregar temporalmente este comando en el apartado de comandos de tu archivo render.yaml o en la sección de comandos de Render:
+#
+#   - 'python manage.py create_default_users'
+#
+# Esto creará los usuarios por defecto en la base de datos de Render durante el despliegue. Luego puedes quitarlo para evitar duplicados.
+
 # ¡Listo! Render instalará dependencias, migrará la base y servirá tu app Django profesionalmente.
