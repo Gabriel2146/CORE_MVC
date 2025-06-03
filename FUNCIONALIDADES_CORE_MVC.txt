@@ -1,5 +1,3 @@
-FUNCIONALIDADES DESARROLLADAS SEGÚN PROPUESTA CORE MVC
-=====================================================
 
 1. Sincronización de ejercicios desde la API de wger y copia a la base local.
    - Implementado: Sincronización manual desde el panel de administrador.
@@ -109,8 +107,6 @@ FUNCIONALIDADES DESARROLLADAS SEGÚN PROPUESTA CORE MVC
      {% endfor %}
      ```
 
-
-
 8. Recursos educativos (estructura base).
     - Implementado: Vista con enlaces a recursos educativos.
     - Archivo: users/simple_views.py
@@ -143,8 +139,4 @@ FUNCIONALIDADES DESARROLLADAS SEGÚN PROPUESTA CORE MVC
       </body>
       </html>
       ```
-
-ESTADO GENERAL:
----------------
-Todas las funcionalidades principales propuestas en el core MVC han sido implementadas y probadas. El sistema permite la gestión completa de usuarios, planes, ejercicios, progreso y feedback, con experiencia diferenciada para cada rol (Administrador, Entrenador, Deportista, Invitado).
 

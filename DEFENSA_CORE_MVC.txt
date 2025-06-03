@@ -1,0 +1,68 @@
+AVANCE Y DEFENSA – PROYECTO CORE MVC
+
+---
+
+1. RESUMEN DEL PROYECTO
+CORE_MVC es una plataforma web para la gestión de entrenamientos deportivos, permitiendo a administradores y entrenadores gestionar usuarios, ejercicios, planes y el seguimiento de deportistas. El sistema integra datos de una API externa (wger) y ofrece dashboards modernos y reportes exportables.
+
+2. FUNCIONALIDADES CLAVE IMPLEMENTADAS
+- Registro y login de usuarios con roles diferenciados (admin, entrenador, deportista, invitado).
+- Dashboards visuales y profesionales para admin y entrenador.
+- Gestión de usuarios, ejercicios y planes de entrenamiento.
+- Catálogo de ejercicios con filtros, badges y layout responsivo.
+- Asignación y seguimiento de planes de entrenamiento.
+- Sincronización con API wger y registro de logs.
+- Exportación de reportes en CSV.
+- Seguridad: validación de contraseñas, autenticación JWT, CORS.
+- Comando custom para crear usuarios por defecto.
+- Despliegue exitoso en Render y Domcloud.
+
+3. UBICACIÓN DE ARCHIVOS CLAVE
+- Configuración general: core_mvc_backend/settings.py
+- Modelos y lógica de usuarios: users/models.py, users/views.py
+- Modelos y lógica de entrenamiento: training/models.py, training/views.py
+- Sincronización wger: wger_integration/services.py, wger_integration/management/commands
+- Templates y vistas: users/templates/users/
+- Comando para usuarios por defecto: users/management/commands/create_default_users.py
+- Despliegue: PASOS_DESPLIEGUE_DOMCLOUD.txt, RENDER_DEPLOY.md
+
+4. OBSERVACIONES Y RETOS
+- La sincronización con wger requirió lógica adicional para importar nombres y descripciones por separado, debido a limitaciones de la API.
+- Se implementó manejo de errores y validación de datos importados.
+- El despliegue en Render y Domcloud requirió ajustes en settings.py para soportar variables de entorno y bases de datos externas.
+- Se agregaron comandos custom para facilitar la creación de datos iniciales.
+
+5. POSIBLES PREGUNTAS DEL PROFESOR Y RESPUESTAS SUGERIDAS
+- ¿Cómo manejas la autenticación y los roles?
+  R: Usando un modelo custom de usuario (users/models.py) y autenticación JWT (rest_framework_simplejwt).
+- ¿Cómo se realiza la sincronización con wger?
+  R: Mediante servicios en wger_integration/services.py y comandos custom; se importan nombres y descripciones por separado.
+- ¿Cómo se gestiona la seguridad?
+  R: Validación de contraseñas, autenticación JWT, CORS configurado en settings.py, y roles de usuario.
+- ¿Cómo se puede agregar un nuevo tipo de usuario o funcionalidad?
+  R: Modificando el modelo User y agregando vistas/templates según el nuevo flujo.
+- ¿Qué harías para mejorar la experiencia móvil?
+  R: Mejorar media queries en los templates y probar en dispositivos reales.
+- ¿Cómo migrarías datos entre entornos?
+  R: Usando pg_dump/psql para PostgreSQL o comandos de Django para fixtures.
+- ¿Cómo agregarías un gráfico al dashboard?
+  R: Usando librerías JS como Chart.js y pasando los datos desde la vista al template.
+
+6. POSIBLES CAMBIOS QUE PUEDE PEDIR EL PROFESOR Y CÓMO HACERLOS
+- Agregar paginación a tablas: Usar Paginator de Django en la vista y actualizar el template.
+- Mejorar filtros en el catálogo: Añadir más campos de búsqueda en la vista y el formulario.
+- Agregar validaciones extra en formularios: Modificar forms.py y templates para mostrar mensajes.
+- Cambiar colores o estilos: Editar los archivos CSS en los templates.
+- Agregar logs de actividad: Crear un modelo Log y registrar acciones en las vistas.
+- Permitir carga masiva de usuarios: Implementar importación desde CSV en users/views.py.
+
+7. RECOMENDACIONES PARA LA DEFENSA
+- Lleva capturas de pantalla de todas las vistas clave.
+- Ten a mano los archivos de configuración y comandos custom.
+- Explica cómo resolviste los retos de integración y despliegue.
+- Muestra cómo puedes hacer cambios rápidos (por ejemplo, crear un usuario o modificar un template).
+- Si el profesor pide un cambio, explica en qué archivo lo harías y cómo lo probarías.
+
+---
+
+¡Éxito en la defensa!

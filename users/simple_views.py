@@ -859,3 +859,48 @@ def trainer_exercises_advanced(request):
         'difficulty': difficulty,
         'equipment': equipment
     })
+
+@login_required
+@csrf_exempt
+def trainer_athlete_report(request):
+    user = request.user
+    if user.role != 'trainer':
+        raise PermissionDenied
+    from users.models import User
+    from training.models import ProgressEntry
+    from django.db.models import Sum, Max, Avg
+    from datetime import date, timedelta
+
+    # Top deportistas por peso máximo levantado (últimos 30 días)
+    last_30_days = date.today() - timedelta(days=30)
+    progress = ProgressEntry.objects.filter(user__role='athlete', date__gte=last_30_days)
+    top_athletes = (
+        progress.values('user')
+        .annotate(max_weight=Max('weight'), date=Max('date'))
+        .order_by('-max_weight')[:10]
+    )
+    # Obtener instancias de usuario para mostrar nombre
+    user_ids = [a['user'] for a in top_athletes]
+    users_map = {u.id: u for u in User.objects.filter(id__in=user_ids)}
+    for a in top_athletes:
+        a['user'] = users_map.get(a['user'])
+
+    # Comparativa de desempeño: total de sesiones, peso total y promedio por sesión
+    athletes_performance = (
+        progress.values('user')
+        .annotate(
+            total_sessions=Sum('sets'),
+            total_weight=Sum('weight'),
+            avg_weight=Avg('weight')
+        )
+        .order_by('-total_weight')
+    )
+    user_ids_perf = [a['user'] for a in athletes_performance]
+    users_map_perf = {u.id: u for u in User.objects.filter(id__in=user_ids_perf)}
+    for a in athletes_performance:
+        a['user'] = users_map_perf.get(a['user'])
+
+    return render(request, 'users/trainer_athlete_report.html', {
+        'top_athletes': top_athletes,
+        'athletes_performance': athletes_performance
+    })

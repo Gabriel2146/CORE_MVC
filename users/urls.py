@@ -63,4 +63,5 @@ urlpatterns = [
 
     path('trainer/athlete/<int:athlete_id>/progress_graph/', simple_views.trainer_athlete_progress_graph, name='trainer_athlete_progress_graph'),
     path('trainer/athlete/<int:athlete_id>/plans/', simple_views.trainer_athlete_plans, name='trainer_athlete_plans'),
+    path('trainer/athlete-report/', simple_views.trainer_athlete_report, name='trainer_athlete_report'),
 ]

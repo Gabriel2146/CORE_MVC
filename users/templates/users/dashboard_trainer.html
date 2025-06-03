@@ -83,6 +83,9 @@
         <li>
             <a class="trainer-dashboard-link" href="/trainer/auto-generate-plan/"><i class="bi bi-lightning-charge"></i> Generar plan automático para un deportista</a>
         </li>
+        <li>
+            <a class="trainer-dashboard-link" href="{% url 'users:trainer_athlete_report' %}"><i class="bi bi-trophy"></i> Reporte de desempeño de deportistas</a>
+        </li>
     </ul>
     <a class="logout-link" href="{% url 'users:logout' %}"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
     {% endblock %}
