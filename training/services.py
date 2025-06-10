@@ -48,6 +48,57 @@ def calculate_effectiveness_index(plan):
         index -= 20
     return max(0, round(index, 1))
 
+def calculate_session_effectiveness(session):
+    """
+    Calcula el índice de efectividad de una sesión de entrenamiento.
+    Ejemplo simple: promedio de (sets * reps * weight) por ejercicio.
+    """
+    from .models import ExerciseEntry
+    entries = ExerciseEntry.objects.filter(session=session)
+    if not entries.exists():
+        return 0.0
+    total = sum(e.sets * e.reps * e.weight for e in entries)
+    return total / entries.count()
+
+
+def update_all_sessions_effectiveness():
+    """
+    Calcula y guarda el índice de efectividad para todas las sesiones.
+    """
+    from .models import TrainingSession
+    for session in TrainingSession.objects.all():
+        session.effectiveness_index = calculate_session_effectiveness(session)
+        session.save()
+
+
+def get_top_sessions_by_effectiveness(top_n=5):
+    """
+    Devuelve las sesiones con mayor efectividad.
+    """
+    from .models import TrainingSession
+    return TrainingSession.objects.order_by('-effectiveness_index')[:top_n]
+
+
+def get_avg_effectiveness_by_goal():
+    """
+    Devuelve el promedio de efectividad por objetivo (goals del plan).
+    """
+    from .models import TrainingSession
+    from django.db.models import Avg
+    return (
+        TrainingSession.objects.values('training_plan__goals')
+        .annotate(avg_effectiveness=Avg('effectiveness_index'))
+        .order_by('-avg_effectiveness')
+    )
+
+
+def get_top_goal_by_effectiveness():
+    """
+    Devuelve el objetivo (goals) con mayor promedio de efectividad.
+    """
+    avg_by_goal = get_avg_effectiveness_by_goal()
+    return avg_by_goal[0] if avg_by_goal else None
+
 class TrainingPlanGenerator:
     def __init__(self, user_profile, training_history, objectives):
         self.user_profile = user_profile

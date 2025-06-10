@@ -1,0 +1,99 @@
+{% extends 'users/base.html' %}
+{% block title %}Ranking de Efectividad{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Ranking de Efectividad de Sesiones de Entrenamiento</h1>
+    <h2>Top Sesiones Más Efectivas</h2>
+    <table class="table table-striped" id="top-sessions-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Usuario</th>
+                <th>Objetivo</th>
+                <th>Fecha</th>
+                <th>Índice de Efectividad</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <h2>Promedio de Efectividad por Objetivo</h2>
+    <table class="table table-bordered" id="avg-goal-table">
+        <thead>
+            <tr>
+                <th>Objetivo</th>
+                <th>Promedio de Efectividad</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <h2>Mejor Objetivo por Efectividad</h2>
+    <div class="alert alert-success" id="top-goal"></div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+async function fetchData() {
+    const fetchOptions = {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Accept': 'application/json'
+        }
+    };
+    const [topSessions, avgGoals, topGoal] = await Promise.all([
+        fetch('/api/training/top-sessions-effectiveness/', fetchOptions).then(r => r.json()),
+        fetch('/api/training/avg-effectiveness-by-goal/', fetchOptions).then(r => r.json()),
+        fetch('/api/training/top-goal-by-effectiveness/', fetchOptions).then(r => r.json())
+    ]);
+    // Top sesiones
+    const topTable = document.querySelector('#top-sessions-table tbody');
+    topTable.innerHTML = '';
+    (topSessions.top_sessions || []).forEach((s, i) => {
+        const row = `<tr>
+            <td>${i+1}</td>
+            <td>${s.user || '-'}</td>
+            <td>${s.goal || '-'}</td>
+            <td>${s.date || '-'}</td>
+            <td>${s.effectiveness_index !== undefined ? s.effectiveness_index.toFixed(2) : '-'}</td>
+        </tr>`;
+        topTable.innerHTML += row;
+    });
+    // Promedio por objetivo
+    const avgTable = document.querySelector('#avg-goal-table tbody');
+    avgTable.innerHTML = '';
+    (avgGoals.avg_by_goal || []).forEach(g => {
+        const row = `<tr>
+            <td>${g.goal || '-'}</td>
+            <td>${g.avg_effectiveness !== undefined ? g.avg_effectiveness.toFixed(2) : '-'}</td>
+        </tr>`;
+        avgTable.innerHTML += row;
+    });
+    // Mejor objetivo
+    const topGoalData = topGoal.top_goal;
+    document.getElementById('top-goal').innerText = topGoalData && topGoalData.goal
+        ? `El objetivo con mayor efectividad promedio es: ${topGoalData.goal} (${topGoalData.avg_effectiveness.toFixed(2)})`
+        : 'No hay datos disponibles.';
+}
+document.addEventListener('DOMContentLoaded', fetchData);
+</script>
+{% endblock %}

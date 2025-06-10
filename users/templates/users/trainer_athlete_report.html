@@ -22,8 +22,25 @@
 .top-athletes-table tr:hover {
     background: #eaf6ff;
 }
+.admin-section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+}
+.form-range {
+    width: 25%;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 1rem;
+}
+.table-responsive {
+    margin-bottom: 2rem;
+}
 @media (max-width: 768px) {
     .top-athletes-title { font-size: 1.3rem; }
+    .admin-section-title { font-size: 1.2rem; }
+    .form-range { width: 100%; margin-left: 0; }
 }
 </style>
 {% endblock %}
@@ -101,5 +118,105 @@
         </tbody>
     </table>
 </div>
+<div class="admin-section-title mt-5"><i class="bi bi-bar-chart"></i> Ranking de Efectividad de Sesiones
+    <input type="range" min="1" max="10" value="5" class="form-range" id="rankingSlider" style="vertical-align:middle;">
+    <span id="rankingValue" class="fw-bold">5</span> sesiones
+</div>
+<div class="table-responsive mb-4">
+    <table class="table table-striped" id="top-sessions-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Usuario</th>
+                <th>Objetivo</th>
+                <th>Fecha</th>
+                <th>Índice de Efectividad</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <h5>Promedio de Efectividad por Objetivo</h5>
+    <table class="table table-bordered" id="avg-goal-table">
+        <thead>
+            <tr>
+                <th>Objetivo</th>
+                <th>Promedio de Efectividad</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <h5>Mejor Objetivo por Efectividad</h5>
+    <div class="alert alert-success" id="top-goal"></div>
+</div>
 <a class="btn btn-secondary mt-3" href="{% url 'users:dashboard' %}"><i class="bi bi-arrow-left"></i> Volver al Dashboard</a>
+{% endblock %}
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+async function fetchRanking(topN) {
+    const fetchOptions = {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Accept': 'application/json'
+        }
+    };
+    // Top sesiones
+    const topSessions = await fetch(`/api/training/top-sessions-effectiveness/?top_n=${topN}`, fetchOptions).then(r => r.json());
+    const avgGoals = await fetch('/api/training/avg-effectiveness-by-goal/', fetchOptions).then(r => r.json());
+    const topGoal = await fetch('/api/training/top-goal-by-effectiveness/', fetchOptions).then(r => r.json());
+    const topTable = document.querySelector('#top-sessions-table tbody');
+    topTable.innerHTML = '';
+    (topSessions.top_sessions || []).forEach((s, i) => {
+        const row = `<tr>
+            <td>${i+1}</td>
+            <td>${s.user || '-'}</td>
+            <td>${s.goal || '-'}</td>
+            <td>${s.date || '-'}</td>
+            <td>${s.effectiveness_index !== undefined ? s.effectiveness_index.toFixed(2) : '-'}</td>
+        </tr>`;
+        topTable.innerHTML += row;
+    });
+    // Promedio por objetivo
+    const avgTable = document.querySelector('#avg-goal-table tbody');
+    avgTable.innerHTML = '';
+    (avgGoals.avg_by_goal || []).forEach(g => {
+        const row = `<tr>
+            <td>${g.goal || '-'}</td>
+            <td>${g.avg_effectiveness !== undefined ? g.avg_effectiveness.toFixed(2) : '-'}</td>
+        </tr>`;
+        avgTable.innerHTML += row;
+    });
+    // Mejor objetivo
+    const topGoalData = topGoal.top_goal;
+    document.getElementById('top-goal').innerText = topGoalData && topGoalData.goal
+        ? `El objetivo con mayor efectividad promedio es: ${topGoalData.goal} (${topGoalData.avg_effectiveness.toFixed(2)})`
+        : 'No hay datos disponibles.';
+}
+const slider = document.getElementById('rankingSlider');
+const rankingValue = document.getElementById('rankingValue');
+slider.addEventListener('input', function() {
+    rankingValue.textContent = slider.value;
+    fetchRanking(slider.value);
+});
+document.addEventListener('DOMContentLoaded', function() {
+    fetchRanking(slider.value);
+});
+</script>
 {% endblock %}

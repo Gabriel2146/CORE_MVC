@@ -29,6 +29,7 @@ class TrainingSession(models.Model):
     training_plan = models.ForeignKey(TrainingPlan, on_delete=models.CASCADE, related_name='sessions')
     date = models.DateField()
     notes = models.TextField(blank=True)
+    effectiveness_index = models.FloatField(default=0.0)  # reto campo efectividad 
 
     def __str__(self):
         return "Session on " + str(self.date) + " for " + str(self.training_plan)
