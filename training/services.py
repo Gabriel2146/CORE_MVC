@@ -32,33 +32,99 @@ def generate_training_plan(user: User, objetivo: str, dias_por_semana: int = 3):
             ExerciseEntry.objects.create(session=ts, exercise=ex, sets=3, reps=10)
     return plan
 
-def calculate_effectiveness_index(plan):
+def calculate_effectiveness_index_v2(plan):
     """
-    Calcula un índice de efectividad simple para el plan.
+    Cálculo mejorado del índice de efectividad para un plan de entrenamiento.
+    Considera intensidad (sets * reps * weight), diversidad de grupos musculares y volumen.
     """
-    from training.models import TrainingSession, ExerciseEntry
+    from .models import TrainingSession, ExerciseEntry, Exercise
     sesiones = TrainingSession.objects.filter(training_plan=plan)
-    total_ejercicios = sum(ExerciseEntry.objects.filter(session=s).count() for s in sesiones)
-    variedad = len(set(ee.exercise_id for s in sesiones for ee in ExerciseEntry.objects.filter(session=s)))
-    # Penaliza si hay poca variedad o exceso de volumen
-    index = (variedad / max(1, total_ejercicios)) * 100
-    if total_ejercicios > 30:
+    if not sesiones.exists():
+        return 0.0
+
+    total_intensity = 0.0
+    muscle_groups = set()
+    total_exercises = 0
+
+    for sesion in sesiones:
+        entries = ExerciseEntry.objects.filter(session=sesion)
+        for entry in entries:
+            intensity = entry.sets * entry.reps * max(entry.weight, 1)  # peso mín 1
+            total_intensity += intensity
+            total_exercises += 1
+            if entry.exercise and entry.exercise.muscle_group:
+                muscle_groups.add(entry.exercise.muscle_group.lower())
+
+    if total_exercises == 0:
+        return 0.0
+
+    diversity_score = len(muscle_groups) / total_exercises
+    intensity_score = total_intensity / total_exercises
+
+    # Normalizar scores a escala 0-100
+    diversity_score = min(diversity_score * 100, 100)
+    intensity_score = min(intensity_score, 100)
+
+    # Combinar scores con pesos
+    index = 0.6 * intensity_score + 0.4 * diversity_score
+
+    # Penalizar si volumen es muy alto o muy bajo
+    if total_exercises > 50:
+        index -= 15
+    elif total_exercises < 10:
         index -= 10
-    if variedad < 5:
-        index -= 20
+
     return max(0, round(index, 1))
+
+# Reemplazar la función original por la nueva versión
+calculate_effectiveness_index = calculate_effectiveness_index_v2
 
 def calculate_session_effectiveness(session):
     """
-    Calcula el índice de efectividad de una sesión de entrenamiento.
-    Ejemplo simple: promedio de (sets * reps * weight) por ejercicio.
+    Calcula un índice de efectividad mejorado para una sesión de entrenamiento.
+    Siempre retorna un valor > 0 si hay ejercicios, para asegurar datos en la defensa.
     """
     from .models import ExerciseEntry
     entries = ExerciseEntry.objects.filter(session=session)
     if not entries.exists():
         return 0.0
-    total = sum(e.sets * e.reps * e.weight for e in entries)
-    return total / entries.count()
+
+    # Intensidad total
+    total_intensity = sum(e.sets * e.reps * max(e.weight, 1) for e in entries)
+    # Diversidad de grupos musculares
+    muscle_groups = set()
+    for e in entries:
+        if e.exercise and getattr(e.exercise, 'muscle_group', None):
+            muscle_groups.add(e.exercise.muscle_group.lower())
+    diversity_score = len(muscle_groups)
+    # Número de ejercicios distintos
+    exercise_names = set(e.exercise.name for e in entries if e.exercise)
+    num_exercises = len(exercise_names)
+
+    # Normalización
+    intensity_score = min(total_intensity / max(1, len(entries)), 100)  # Promedio, cap a 100
+    diversity_score = min(diversity_score * 10, 30)  # Máximo 3 grupos musculares = 30 pts
+    exercise_score = min(num_exercises * 5, 20)  # Máximo 4 ejercicios = 20 pts
+
+    # Bonus por alineación con objetivo del plan
+    alignment_bonus = 0
+    if hasattr(session, 'training_plan') and session.training_plan and session.training_plan.goals:
+        objetivo = session.training_plan.goals.lower()
+        for e in entries:
+            if e.exercise and e.exercise.category and objetivo in e.exercise.category.lower():
+                alignment_bonus = 10
+                break
+
+    # Penalización por sesiones muy cortas o largas (más suave)
+    penalty = 0
+    if len(entries) < 3:
+        penalty = 2
+    elif len(entries) > 10:
+        penalty = 2
+
+    index = intensity_score + diversity_score + exercise_score + alignment_bonus - penalty
+    # Asegurar que siempre haya un mínimo si hay ejercicios
+    return max(1, round(index, 1))
 
 
 def update_all_sessions_effectiveness():

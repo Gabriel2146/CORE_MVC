@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .forms import CustomUserCreationForm
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
@@ -15,7 +15,99 @@ from django.contrib.auth.forms import UserChangeForm
 import subprocess
 from django.contrib import messages
 from django import forms
-from training.services import generate_training_plan, calculate_effectiveness_index
+from training.services import generate_training_plan
+
+def permission_denied_view(request, exception=None):
+    return JsonResponse({'detail': 'Permission denied'}, status=403)
+
+# Decorator to catch PermissionDenied and return 403 JSON response for API views
+def catch_permission_denied(view_func):
+    def _wrapped_view(request, *args, **kwargs):
+        try:
+            return view_func(request, *args, **kwargs)
+        except PermissionDenied:
+            return JsonResponse({'detail': 'Permission denied'}, status=403)
+    return _wrapped_view
+
+# Apply the decorator to all views that require role checks
+# For example, decorate trainer_athlete_report
+
+@login_required
+@csrf_exempt
+@catch_permission_denied
+def trainer_athlete_report(request):
+    user = request.user
+    if user.role != 'trainer':
+        raise PermissionDenied
+    from users.models import User
+    from training.models import ProgressEntry, Exercise
+    from django.db.models import Max, Avg
+    from datetime import datetime
+
+    # Obtener filtros
+    selected_exercise = request.GET.get('exercise')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    # Listado de ejercicios y fechas disponibles
+    exercises = ProgressEntry.objects.values_list('exercise', flat=True).distinct()
+    dates = ProgressEntry.objects.values_list('date', flat=True).distinct().order_by('-date')
+
+    # Filtro base: solo deportistas
+    progress = ProgressEntry.objects.filter(user__role='athlete')
+    if selected_exercise:
+        progress = progress.filter(exercise=selected_exercise)
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+            progress = progress.filter(date__gte=start_date_obj)
+        except Exception:
+            pass
+    if end_date:
+        try:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+            progress = progress.filter(date__lte=end_date_obj)
+        except Exception:
+            pass
+
+    # Top por peso levantado en ese ejercicio y rango de fechas
+    top_athletes = (
+        progress.values('user')
+        .annotate(max_weight=Max('weight'), date=Max('date'))
+        .order_by('-max_weight')[:10]
+    )
+    user_ids = [a['user'] for a in top_athletes]
+    users_map = {u.id: u for u in User.objects.filter(id__in=user_ids)}
+    for a in top_athletes:
+        a['user'] = users_map.get(a['user'])
+
+    # Comparativa de mejora: diferencia entre el primer y último registro de peso por usuario
+    comparativa = []
+    for athlete_id in user_ids:
+        athlete_progress = progress.filter(user_id=athlete_id).order_by('date')
+        if athlete_progress.exists():
+            first = athlete_progress.first().weight
+            last = athlete_progress.last().weight
+            improvement = last - first
+            percent_improvement = ((last - first) / first * 100) if first else 0
+            comparativa.append({
+                'user': users_map.get(athlete_id),
+                'first_weight': first,
+                'last_weight': last,
+                'improvement': improvement,
+                'percent_improvement': percent_improvement
+            })
+    comparativa = sorted(comparativa, key=lambda x: x['improvement'], reverse=True)
+
+    return render(request, 'users/trainer_athlete_report.html', {
+        'top_athletes': top_athletes,
+        'comparativa': comparativa,
+        'exercises': exercises,
+        'dates': dates,
+        'selected_exercise': selected_exercise,
+        'start_date': start_date,
+        'end_date': end_date,
+    })
 import csv
 from training.models import PlanFeedback
 from django.db.models import F

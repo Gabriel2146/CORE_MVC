@@ -61,7 +61,11 @@ def update_sessions_effectiveness_view(request):
     update_all_sessions_effectiveness()
     return Response({'status': 'Índices de efectividad actualizados'})
 
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes
+
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def top_sessions_effectiveness_view(request):
     top_sessions = get_top_sessions_by_effectiveness(5)
     data = [
@@ -77,6 +81,7 @@ def top_sessions_effectiveness_view(request):
     return Response({'top_sessions': data})
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def avg_effectiveness_by_goal_view(request):
     avg_by_goal = get_avg_effectiveness_by_goal()
     data = [
@@ -88,6 +93,7 @@ def avg_effectiveness_by_goal_view(request):
     return Response({'avg_by_goal': data})
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def top_goal_by_effectiveness_view(request):
     top_goal = get_top_goal_by_effectiveness()
     if top_goal:
