@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from .models import TrainingPlan, Exercise
 import random
 from users.models import User
+from abc import ABC, abstractmethod
 
 def generate_training_plan(user: User, objetivo: str, dias_por_semana: int = 3):
     from .models import Exercise, TrainingPlan
@@ -164,6 +165,82 @@ def get_top_goal_by_effectiveness():
     """
     avg_by_goal = get_avg_effectiveness_by_goal()
     return avg_by_goal[0] if avg_by_goal else None
+
+# PRINCIPIO SRP: Cada clase tiene una única responsabilidad
+# PRINCIPIO OCP: Se pueden agregar nuevos generadores o cálculos de efectividad sin modificar el código existente
+
+# Clase base para generadores de planes (OCP)
+class BaseTrainingPlanGenerator(ABC):
+    def __init__(self, user, objetivo, dias_por_semana=3):
+        self.user = user
+        self.objetivo = objetivo
+        self.dias_por_semana = dias_por_semana
+
+    @abstractmethod
+    def generate(self):
+        pass
+
+# Generador concreto para fuerza
+class FuerzaTrainingPlanGenerator(BaseTrainingPlanGenerator):
+    def generate(self):
+        ejercicios = Exercise.objects.filter(category__icontains='fuerza')
+        return self._create_plan(ejercicios)
+    def _create_plan(self, ejercicios):
+        return generate_training_plan(self.user, self.objetivo, self.dias_por_semana)
+
+# Generador concreto para resistencia
+class ResistenciaTrainingPlanGenerator(BaseTrainingPlanGenerator):
+    def generate(self):
+        ejercicios = Exercise.objects.filter(category__icontains='resistencia')
+        return self._create_plan(ejercicios)
+    def _create_plan(self, ejercicios):
+        return generate_training_plan(self.user, self.objetivo, self.dias_por_semana)
+
+# Generador concreto para básico/general
+class BasicoTrainingPlanGenerator(BaseTrainingPlanGenerator):
+    def generate(self):
+        ejercicios = Exercise.objects.filter(category__icontains='básico') | Exercise.objects.filter(category__icontains='general')
+        return self._create_plan(ejercicios)
+    def _create_plan(self, ejercicios):
+        return generate_training_plan(self.user, self.objetivo, self.dias_por_semana)
+
+# Generador por defecto
+class DefaultTrainingPlanGenerator(BaseTrainingPlanGenerator):
+    def generate(self):
+        ejercicios = Exercise.objects.all()
+        return self._create_plan(ejercicios)
+    def _create_plan(self, ejercicios):
+        return generate_training_plan(self.user, self.objetivo, self.dias_por_semana)
+
+# Clase base para cálculo de efectividad (OCP)
+class BaseEffectivenessCalculator(ABC):
+    @abstractmethod
+    def calculate(self, plan):
+        pass
+
+# Calculadora concreta usando la función existente
+class DefaultEffectivenessCalculator(BaseEffectivenessCalculator):
+    def calculate(self, plan):
+        return calculate_effectiveness_index_v2(plan)
+
+# Ejemplo de uso de los principios:
+def crear_plan_entrenamiento_SOLID(user, objetivo, dias_por_semana=3, calculator=None):
+    """
+    Crea un plan de entrenamiento aplicando SRP y OCP.
+    """
+    if 'fuerza' in objetivo.lower():
+        generator = FuerzaTrainingPlanGenerator(user, objetivo, dias_por_semana)
+    elif 'resistencia' in objetivo.lower():
+        generator = ResistenciaTrainingPlanGenerator(user, objetivo, dias_por_semana)
+    elif 'básico' in objetivo.lower() or 'general' in objetivo.lower():
+        generator = BasicoTrainingPlanGenerator(user, objetivo, dias_por_semana)
+    else:
+        generator = DefaultTrainingPlanGenerator(user, objetivo, dias_por_semana)
+    plan = generator.generate()
+    if calculator is None:
+        calculator = DefaultEffectivenessCalculator()
+    efectividad = calculator.calculate(plan)
+    return plan, efectividad
 
 class TrainingPlanGenerator:
     def __init__(self, user_profile, training_history, objectives):
