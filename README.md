@@ -86,3 +86,13 @@ efectividad = strategy.calculate(plan)
 ```
 
 Estas prácticas mejoran la mantenibilidad, escalabilidad y facilidad de pruebas del sistema.
+
+---
+
+### ¿Por qué se eligieron estos principios y patrones?
+
+- **SRP y OCP** fueron seleccionados porque permiten que el sistema sea fácil de mantener y extender. Separar responsabilidades reduce errores y facilita el trabajo en equipo, mientras que la posibilidad de extender funcionalidades sin modificar el código existente minimiza riesgos y acelera la evolución del sistema.
+- **Factory** se eligió para centralizar y desacoplar la creación de objetos complejos, facilitando la gestión de diferentes tipos de generadores de planes de entrenamiento según el objetivo del usuario.
+- **Strategy** se implementó para permitir cambiar fácilmente el algoritmo de cálculo de efectividad, adaptándose a nuevas necesidades del negocio sin afectar el resto del sistema.
+
+Estas decisiones permiten que el proyecto sea robusto, flexible y preparado para cambios futuros.
