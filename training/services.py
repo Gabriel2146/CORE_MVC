@@ -223,6 +223,29 @@ class DefaultEffectivenessCalculator(BaseEffectivenessCalculator):
     def calculate(self, plan):
         return calculate_effectiveness_index_v2(plan)
 
+# PATRÓN FACTORY: Factoría para generadores de planes
+class TrainingPlanFactory:
+    @staticmethod
+    def get_generator(user, objetivo, dias_por_semana=3):
+        if 'fuerza' in objetivo.lower():
+            return FuerzaTrainingPlanGenerator(user, objetivo, dias_por_semana)
+        elif 'resistencia' in objetivo.lower():
+            return ResistenciaTrainingPlanGenerator(user, objetivo, dias_por_semana)
+        elif 'básico' in objetivo.lower() or 'general' in objetivo.lower():
+            return BasicoTrainingPlanGenerator(user, objetivo, dias_por_semana)
+        else:
+            return DefaultTrainingPlanGenerator(user, objetivo, dias_por_semana)
+
+# PATRÓN STRATEGY: Estrategias de cálculo de efectividad
+class EffectivenessStrategy(ABC):
+    @abstractmethod
+    def calculate(self, plan):
+        pass
+
+class DefaultEffectivenessStrategy(EffectivenessStrategy):
+    def calculate(self, plan):
+        return calculate_effectiveness_index_v2(plan)
+
 # Ejemplo de uso de los principios:
 def crear_plan_entrenamiento_SOLID(user, objetivo, dias_por_semana=3, calculator=None):
     """
@@ -240,6 +263,19 @@ def crear_plan_entrenamiento_SOLID(user, objetivo, dias_por_semana=3, calculator
     if calculator is None:
         calculator = DefaultEffectivenessCalculator()
     efectividad = calculator.calculate(plan)
+    return plan, efectividad
+
+# Ejemplo de uso de Factory y Strategy
+
+def crear_plan_entrenamiento_factory_strategy(user, objetivo, dias_por_semana=3, strategy=None):
+    """
+    Crea un plan de entrenamiento usando Factory y Strategy.
+    """
+    generator = TrainingPlanFactory.get_generator(user, objetivo, dias_por_semana)
+    plan = generator.generate()
+    if strategy is None:
+        strategy = DefaultEffectivenessStrategy()
+    efectividad = strategy.calculate(plan)
     return plan, efectividad
 
 class TrainingPlanGenerator:
