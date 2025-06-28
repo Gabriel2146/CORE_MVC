@@ -58,3 +58,31 @@ El comando `populate_progress_entries` crea datos de progreso para todos los dep
 
 ## Licencia
 MIT
+
+---
+
+## Mejores Prácticas: Principios SOLID y Patrones de Diseño
+
+### Principios SOLID aplicados
+- **Single Responsibility Principle (SRP):**
+  - Cada clase tiene una única responsabilidad. Por ejemplo, la generación de planes de entrenamiento y el cálculo de efectividad están separados en clases independientes en `training/services.py`.
+- **Open/Closed Principle (OCP):**
+  - El sistema permite agregar nuevos tipos de generadores de planes o cálculos de efectividad creando nuevas subclases, sin modificar el código existente.
+
+### Patrones de Diseño aplicados
+- **Factory:**
+  - Se utiliza una factoría (`TrainingPlanFactory`) para instanciar el generador de planes adecuado según el objetivo del usuario.
+- **Strategy:**
+  - Se implementa una estrategia (`EffectivenessStrategy`) para el cálculo de efectividad, permitiendo intercambiar algoritmos fácilmente.
+
+#### Ejemplo de uso
+```python
+from training.services import TrainingPlanFactory, DefaultEffectivenessStrategy
+
+generator = TrainingPlanFactory.get_generator(user, 'fuerza', dias_por_semana=3)
+plan = generator.generate()
+strategy = DefaultEffectivenessStrategy()
+efectividad = strategy.calculate(plan)
+```
+
+Estas prácticas mejoran la mantenibilidad, escalabilidad y facilidad de pruebas del sistema.
