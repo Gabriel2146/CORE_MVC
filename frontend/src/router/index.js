@@ -12,6 +12,13 @@ import DashboardAdmin from '../views/DashboardAdmin.vue'
 import AdminExercises from '../views/AdminExercises.vue'
 import AdminTrainingPlans from '../views/AdminTrainingPlans.vue'
 import AdminUsers from '../views/AdminUsers.vue'
+import DashboardTrainer from '../views/DashboardTrainer.vue'
+import TrainerTrainingPlans from '../views/TrainerTrainingPlans.vue'
+import TrainerExercises from '../views/TrainerExercises.vue'
+import TrainerAthleteProgress from '../views/TrainerAthleteProgress.vue'
+import TrainerAutoGeneratePlan from '../views/TrainerAutoGeneratePlan.vue'
+import TrainerAthleteReport from '../views/TrainerAthleteReport.vue'
+import TrainerEffectivenessRanking from '../views/TrainerEffectivenessRanking.vue'
 
 const routes = [
   {
@@ -69,7 +76,7 @@ const routes = [
   {
     path: '/trainer',
     name: 'Trainer',
-    component: Trainer,
+    component: DashboardTrainer,
     meta: { requiresAuth: true, role: 'trainer' }
   },
   {
@@ -95,6 +102,42 @@ const routes = [
     name: 'TrainingPlanCreate',
     component: TrainingPlanCreate,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/trainer/training-plans',
+    name: 'TrainerTrainingPlans',
+    component: TrainerTrainingPlans,
+    meta: { requiresAuth: true, role: 'trainer' }
+  },
+  {
+    path: '/trainer/exercises',
+    name: 'TrainerExercises',
+    component: TrainerExercises,
+    meta: { requiresAuth: true, role: 'trainer' }
+  },
+  {
+    path: '/trainer/athlete-progress',
+    name: 'TrainerAthleteProgress',
+    component: TrainerAthleteProgress,
+    meta: { requiresAuth: true, role: 'trainer' }
+  },
+  {
+    path: '/trainer/auto-generate-plan',
+    name: 'TrainerAutoGeneratePlan',
+    component: TrainerAutoGeneratePlan,
+    meta: { requiresAuth: true, role: 'trainer' }
+  },
+  {
+    path: '/trainer/athlete-report',
+    name: 'TrainerAthleteReport',
+    component: TrainerAthleteReport,
+    meta: { requiresAuth: true, role: 'trainer' }
+  },
+  {
+    path: '/trainer/effectiveness-ranking',
+    name: 'TrainerEffectivenessRanking',
+    component: TrainerEffectivenessRanking,
+    meta: { requiresAuth: true, role: 'trainer' }
   }
 ]
 
