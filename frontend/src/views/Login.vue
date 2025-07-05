@@ -1,20 +1,20 @@
 <template>
   <div class="login-container">
-    <h2>Iniciar Sesión</h2>
-    <form @submit.prevent="login">
-      <div>
-        <label for="username">Usuario:</label>
-        <input id="username" v-model="username" required />
+    <div class="login-title">Bienvenido a CORE MVC</div>
+    <form @submit.prevent="login" autocomplete="off">
+      <div class="mb-3 text-start">
+        <label for="username" class="form-label">Usuario</label>
+        <input type="text" id="username" v-model="username" class="form-control" required autofocus />
       </div>
-      <div>
-        <label for="password">Contraseña:</label>
-        <input id="password" type="password" v-model="password" required />
+      <div class="mb-3 text-start">
+        <label for="password" class="form-label">Contraseña</label>
+        <input type="password" id="password" v-model="password" class="form-control" required />
       </div>
-      <button type="submit">Entrar</button>
-  </form>
-  <p v-if="error" class="error">{{ error }}</p>
-  <p>¿No tienes cuenta? <router-link to="/register">Regístrate aquí</router-link></p>
-</div>
+      <button type="submit" class="btn btn-login w-100">Iniciar sesión</button>
+    </form>
+    <router-link class="login-link" to="/register">¿No tienes cuenta? Regístrate aquí</router-link>
+    <div v-if="error" class="alert alert-danger mt-3">{{ error }}</div>
+  </div>
 </template>
 
 <script>
@@ -41,7 +41,7 @@ export default {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access
 
         // Fetch user info to get role
-        const userResponse = await axios.get('http://localhost:8000/api/users/profile/', {
+        const userResponse = await axios.get('http://localhost:8000/api/users/profile-api/', {
           headers: { Authorization: 'Bearer ' + response.data.access }
         })
         const user = userResponse.data
@@ -79,14 +79,57 @@ export default {
 
 <style scoped>
 .login-container {
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+    max-width: 400px;
+    margin: 60px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1.5px 4px rgba(0,0,0,0.08);
+    padding: 2.5rem 2rem 2rem 2rem;
+    text-align: center;
 }
-.error {
-  color: red;
-  margin-top: 1rem;
+.login-title {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+    letter-spacing: 1px;
+}
+.form-label {
+    font-weight: 500;
+    color: #34495e;
+}
+.form-control {
+    border-radius: 8px;
+    margin-bottom: 1.2rem;
+    font-size: 1.1rem;
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+}
+.btn-login {
+    background: linear-gradient(90deg, #007bff 0%, #00c6ff 100%);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 2.5rem;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+    width: 100%;
+}
+.btn-login:hover {
+    background: linear-gradient(90deg, #0056b3 0%, #00aaff 100%);
+}
+.login-link {
+    margin-top: 1.5rem;
+    display: block;
+    color: #007bff;
+    text-decoration: none;
+}
+.login-link:hover {
+    text-decoration: underline;
+}
+.alert {
+    margin-top: 1rem;
 }
 </style>

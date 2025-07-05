@@ -8,6 +8,10 @@ import Athlete from '../components/Athlete.vue'
 import Guest from '../components/Guest.vue'
 import TrainingPlanList from '../components/TrainingPlanList.vue'
 import TrainingPlanCreate from '../components/TrainingPlanCreate.vue'
+import DashboardAdmin from '../views/DashboardAdmin.vue'
+import AdminExercises from '../views/AdminExercises.vue'
+import AdminTrainingPlans from '../views/AdminTrainingPlans.vue'
+import AdminUsers from '../views/AdminUsers.vue'
 
 const routes = [
   {
@@ -41,7 +45,25 @@ const routes = [
   {
     path: '/admin',
     name: 'Admin',
-    component: Admin,
+    component: DashboardAdmin,
+    meta: { requiresAuth: true, role: 'admin' }
+  },
+  {
+    path: '/admin/exercises',
+    name: 'AdminExercises',
+    component: AdminExercises,
+    meta: { requiresAuth: true, role: 'admin' }
+  },
+  {
+    path: '/admin/training-plans',
+    name: 'AdminTrainingPlans',
+    component: AdminTrainingPlans,
+    meta: { requiresAuth: true, role: 'admin' }
+  },
+  {
+    path: '/admin/users',
+    name: 'AdminUsers',
+    component: AdminUsers,
     meta: { requiresAuth: true, role: 'admin' }
   },
   {
