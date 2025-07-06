@@ -3,16 +3,15 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npx vite build",
     "start": "vite preview --port 10000"
   },
   "dependencies": {
     "vue": "^3.2.0",
     "vue-router": "^4.0.0",
-    "axios": "^0.27.2"
-  },
-  "devDependencies": {
+    "axios": "^0.27.2",
     "vite": "^3.0.0",
     "@vitejs/plugin-vue": "^3.0.0"
-  }
+  },
+  "devDependencies": {}
 }
