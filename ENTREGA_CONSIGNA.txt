@@ -1,0 +1,91 @@
+Elaborado por: Juan José León
+
+OBJETIVO PROPUESTO DE LA CONSIGNA:
+Aplicar conocimientos de Ingeniería web para identificar patrones de diseño en soluciones MVC y diseñar e implementar una integración que resuelva al menos dos problemas del sistema Core MVC, considerando ámbitos de salud pública, seguridad, bienestar y factores globales, culturales, sociales, ambientales y económicos.
+
+---
+
+1. Diagnóstico de la Problemática:
+El sistema Core MVC, desarrollado previamente con Django (MVC), presentaba problemas de acoplamiento entre frontend y backend, dificultad para escalar la interfaz, y limitaciones para exponer datos a otros sistemas o aplicaciones modernas. Además, la experiencia de usuario era limitada por el uso de plantillas HTML tradicionales y recarga de página.
+
+2. Planteamiento de alternativas de solución:
+- Alternativa 1: Mejorar solo el backend, optimizando vistas y lógica interna.
+- Alternativa 2: Migrar el frontend a un framework JS moderno (Vue.js), exponiendo el backend como API RESTful.
+- Alternativa 3: Reescribir el sistema completo en otro stack.
+
+Se selecciona la Alternativa 2 por su balance entre esfuerzo, escalabilidad y modernización, permitiendo integración con otros sistemas y mejor experiencia de usuario.
+
+3. Descripción del proyecto:
+El proyecto consiste en migrar el frontend de Core MVC a Vue.js, consumiendo un API RESTful desarrollado en Django. Se implementan mejoras SOLID y patrones de diseño en el backend, y se moderniza la experiencia de usuario en el frontend. El sistema permite a atletas, entrenadores y administradores gestionar planes, ejercicios y progreso, con navegación moderna y feedback visual.
+
+4. Funcionalidad y restricciones:
+- Funcionalidad: Registro/login, dashboards por rol, gestión de ejercicios, planes, progreso, reportes, ranking, generación automática de planes, feedback y navegación moderna.
+- Restricciones: Integridad de datos, autenticación JWT, consumo exclusivo vía API, roles definidos, despliegue en servicios cloud.
+
+5. Alcance y limitaciones:
+- Alcance: Migración completa de vistas principales, integración API RESTful, mejoras de arquitectura y patrones, pruebas funcionales, despliegue.
+- Limitaciones: No se migran módulos externos, dependencias de endpoints existentes, tiempo limitado para refactorización total.
+
+6. Diagramas:
+- Diagrama de clases: (Ver README o adjunto)
+- Diagrama de actividades/estados: (Ver README o adjunto)
+
+7. Problema identificado y mejoras SOLID/patrones:
+Problema: Acoplamiento entre lógica de negocio y vistas, dificultad para extender funcionalidades.
+Mejoras:
+- Aplicación de Single Responsibility Principle (SRP) separando lógica de negocio en servicios.
+- Uso de Dependency Injection para facilitar pruebas y mantenimiento.
+- Implementación de patrón Repository para acceso a datos.
+- Uso de patrón Factory para creación de objetos complejos (planes, ejercicios).
+
+8. Patrones y principios implementados:
+- SRP y Open/Closed en servicios y vistas.
+- Repository y Factory en backend.
+- Diagrama de mejoras: (Ver README)
+
+9. Pruebas funcionales:
+- Prueba 1: Registro y login de usuario, acceso a dashboard según rol.
+- Prueba 2: Registro de progreso y visualización de historial y gráficos.
+
+10. API propuesta:
+- Endpoints RESTful para usuarios, planes, ejercicios, progreso, reportes.
+- Ejemplo de objeto JSON expuesto:
+{
+  "plan_id": 1,
+  "athlete": "Juan",
+  "exercises": [
+    {"id": 1, "name": "Sentadilla", "sets": 4, "reps": 10, "weight": 60}
+  ]
+}
+
+11. Código:
+- Mejoras SOLID y patrones aplicados en backend (ver carpetas services.py, serializers.py, etc.)
+- API implementada en Django REST Framework.
+- Frontend en Vue.js consumiendo el API.
+- Proyecto deployado en Render/Domcloud.
+
+---
+
+ANÁLISIS DE CUMPLIMIENTO DE LA CONSIGNA:
+
+Actualmente, el proyecto cumple con la mayoría de los requisitos de la consigna:
+- Se identificó y diagnosticó la problemática del sistema original.
+- Se plantearon alternativas y se justificó la solución seleccionada.
+- Se describió el proyecto, funcionalidades, restricciones, alcance y limitaciones.
+- Se hace referencia a diagramas de clases y actividades (deben estar en el README o adjuntos).
+- Se identificó un problema de la implementación inicial y se propusieron mejoras aplicando principios SOLID y patrones de diseño.
+- Se describieron los patrones y principios implementados, con referencia a diagramas.
+- Se documentaron al menos dos pruebas funcionales.
+- Se propuso e implementó un API RESTful, con ejemplo de objeto JSON.
+- Se aplicaron mejoras SOLID y patrones en el backend (ver archivos services.py, serializers.py, etc.).
+- Se implementó un frontend moderno (Vue.js) que consume el API.
+- El proyecto está deployado en la nube.
+
+FALTANTES O RECOMENDACIONES PARA CUMPLIMIENTO 100%:
+1. Adjuntar o incluir explícitamente los diagramas de clases y actividades/estados en el README o como archivos gráficos en el repositorio.
+2. Documentar ejemplos de código concretos donde se apliquen los principios SOLID y patrones de diseño (puede ser en el README o como comentarios en los archivos clave).
+3. Incluir capturas de pantalla o evidencias de las pruebas funcionales realizadas.
+4. Verificar que el README incluya instrucciones claras de despliegue, uso y pruebas.
+5. (Opcional) Agregar referencias a los factores globales, culturales, sociales, ambientales y económicos en la justificación de la solución.
+
+Si se cumplen estos puntos adicionales, la consigna estará cubierta al 100%.
