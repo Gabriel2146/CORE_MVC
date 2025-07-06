@@ -41,7 +41,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "https://front-nxv3.onrender.com",
 ]
 ROOT_URLCONF = 'core_mvc_backend.urls'
 
