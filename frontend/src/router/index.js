@@ -19,6 +19,13 @@ import TrainerAthleteProgress from '../views/TrainerAthleteProgress.vue'
 import TrainerAutoGeneratePlan from '../views/TrainerAutoGeneratePlan.vue'
 import TrainerAthleteReport from '../views/TrainerAthleteReport.vue'
 import TrainerEffectivenessRanking from '../views/TrainerEffectivenessRanking.vue'
+import DashboardAthlete from '../views/DashboardAthlete.vue'
+import AthleteAutoGeneratePlan from '../views/AthleteAutoGeneratePlan.vue'
+import AthleteProgress from '../views/AthleteProgress.vue'
+import AthleteProgressForm from '../views/AthleteProgressForm.vue'
+import AthleteProgressGraph from '../views/AthleteProgressGraph.vue'
+import AthletePlans from '../views/AthletePlans.vue'
+import AthleteExercises from '../views/AthleteExercises.vue'
 
 const routes = [
   {
@@ -82,7 +89,7 @@ const routes = [
   {
     path: '/athlete',
     name: 'Athlete',
-    component: Athlete,
+    component: DashboardAthlete,
     meta: { requiresAuth: true, role: 'athlete' }
   },
   {
@@ -138,6 +145,42 @@ const routes = [
     name: 'TrainerEffectivenessRanking',
     component: TrainerEffectivenessRanking,
     meta: { requiresAuth: true, role: 'trainer' }
+  },
+  {
+    path: '/athlete/auto-generate-plan',
+    name: 'AthleteAutoGeneratePlan',
+    component: AthleteAutoGeneratePlan,
+    meta: { requiresAuth: true, role: 'athlete' }
+  },
+  {
+    path: '/athlete/progress',
+    name: 'AthleteProgress',
+    component: AthleteProgress,
+    meta: { requiresAuth: true, role: 'athlete' }
+  },
+  {
+    path: '/athlete/progress-form',
+    name: 'AthleteProgressForm',
+    component: AthleteProgressForm,
+    meta: { requiresAuth: true, role: 'athlete' }
+  },
+  {
+    path: '/athlete/progress-graph',
+    name: 'AthleteProgressGraph',
+    component: AthleteProgressGraph,
+    meta: { requiresAuth: true, role: 'athlete' }
+  },
+  {
+    path: '/athlete/plans',
+    name: 'AthletePlans',
+    component: AthletePlans,
+    meta: { requiresAuth: true, role: 'athlete' }
+  },
+  {
+    path: '/athlete/exercises',
+    name: 'AthleteExercises',
+    component: AthleteExercises,
+    meta: { requiresAuth: true, role: 'athlete' }
   }
 ]
 
