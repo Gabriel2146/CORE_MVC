@@ -5,8 +5,9 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     port: 3000,
-    proxy: {
-      '/api': 'http://localhost:8000'
-    }
+    // Proxy solo para desarrollo local, eliminar o comentar para producción
+    // proxy: {
+    //   '/api': 'http://localhost:8000'
+    // }
   }
 })

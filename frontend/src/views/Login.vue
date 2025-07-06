@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import api from '../api'
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 
@@ -32,18 +32,16 @@ export default {
 
     const login = async () => {
       try {
-        const response = await axios.post('http://localhost:8000/api/users/token/', {
+        const response = await api.post('/users/token/', {
           username: username.value,
           password: password.value
         })
         localStorage.setItem('access_token', response.data.access)
         localStorage.setItem('refresh_token', response.data.refresh)
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access
+        api.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access
 
         // Fetch user info to get role
-        const userResponse = await axios.get('http://localhost:8000/api/users/profile-api/', {
-          headers: { Authorization: 'Bearer ' + response.data.access }
-        })
+        const userResponse = await api.get('/users/profile-api/')
         const user = userResponse.data
         if (user) {
           localStorage.setItem('user_role', user.role)

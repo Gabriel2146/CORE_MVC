@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import api from '../api'
 import { ref, onMounted } from 'vue'
 
 export default {
@@ -31,9 +31,7 @@ export default {
 
     const fetchPlans = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/training/plans/', {
-          headers: { Authorization: 'Bearer ' + localStorage.getItem('access_token') }
-        })
+        const response = await api.get('/training/plans/')
         plans.value = response.data
       } catch (err) {
         error.value = 'Error al cargar los planes'
@@ -43,9 +41,7 @@ export default {
     const deletePlan = async (id) => {
       if (!confirm('¿Seguro que deseas eliminar este plan?')) return
       try {
-        await axios.delete(`http://localhost:8000/api/training/plans/${id}/`, {
-          headers: { Authorization: 'Bearer ' + localStorage.getItem('access_token') }
-        })
+        await api.delete(`/training/plans/${id}/`)
         success.value = 'Plan eliminado correctamente'
         fetchPlans()
       } catch (err) {
